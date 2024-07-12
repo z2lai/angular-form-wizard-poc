@@ -1,0 +1,70 @@
+<div class="text-secondary">
+  <b>Profile Subform Status:</b>
+  <span
+    [ngClass]="{
+      'text-danger': form.touched && !form.valid,
+      'text-success': form.touched && form.valid
+    }"
+  >
+    {{ form.status }}
+  </span>
+  @if (!form.valid) {{{ form.errors | json }}}
+  {{ form.touched ? 'touched' : 'untouched' }}
+  {{ form.dirty ? 'dirty' : 'pristine' }}
+  <button
+    type="button"
+    (click)="form.markAllAsTouched()"
+    class="btn btn-primary"
+  >
+    Mark All Touched
+  </button>
+  <button type="button" (click)="onDetectChanges()" class="btn btn-primary">
+    Detect Changes
+  </button>
+  <button type="button" (click)="onUpdateValue()" class="btn btn-primary">
+    Update Value and Validity
+  </button>
+  <br />
+  <b>Profile Subform:</b> {{ form.value | json }}
+</div>
+
+<div [formGroup]="form">
+  <div class="row">
+    <div class="col">
+      <app-text-field-cva formControlName="first" (blur)="onTouched()">
+      </app-text-field-cva>
+    </div>
+    <div class="col">
+      <app-text-field-cva formControlName="last" (blur)="onTouched()">
+      </app-text-field-cva>
+    </div>
+  </div>
+  <div class="row">
+    <div
+      class="col"
+      [ngClass]="{
+        'was-validated': genderControl && genderControl.touched
+      }"
+    >
+      <select
+        formControlName="gender"
+        class="form-select mb-3"
+        (blur)="onTouched()"
+      >
+        <option selected disabled value="">Select gender...</option>
+        <option *ngFor="let option of genderOptions" [value]="option">
+          {{ option }}
+        </option>
+      </select>
+      <div class="invalid-feedback">This field is required!</div>
+    </div>
+  </div>
+  <ng-container *ngIf="form.value?.gender === 'Other'">
+    <div class="row">
+      <div class="col">
+        <app-text-field-cva formControlName="genderOther" (blur)="onTouched()">
+        </app-text-field-cva>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,48 @@
+<label style="display:flex; cursor: pointer">
+  Are you a vegan?
+  <input
+    type="checkbox"
+    [ngModel]="burgerSettings().isVegan"
+    (ngModelChange)="isVeganOptionChanged($event)"
+  />
+</label>
+
+<h3>Select bun</h3>
+@for(bun of buns; track bun){
+<button
+  [class.selected]="burgerSettings().bun === bun"
+  (click)="selectBun(bun)"
+>
+  {{ bun }}
+</button>
+}
+
+<h3>Select cheese</h3>
+@for(cheese of cheeses; track cheese){
+<button
+  [class.selected]="burgerSettings().cheese === cheese"
+  (click)="selectCheese(cheese)"
+>
+  {{ cheese }}
+</button>
+}
+
+<h3>Select meat</h3>
+@for(meat of meats; track meat){
+<button
+  [class.selected]="burgerSettings().meat === meat"
+  (click)="selectMeat(meat)"
+>
+  {{ meat }}
+</button>
+}
+
+<h3>Select extras</h3>
+@for(extra of extras; track extra){
+<button
+  [class.selected]="burgerSettings().extras === extra"
+  (click)="selectExtras(extra)"
+>
+  {{ extra }}
+</button>
+}

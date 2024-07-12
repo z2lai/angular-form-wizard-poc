@@ -1,0 +1,12 @@
+<div class="mb-3">
+  <input
+    type="text"
+    [formControl]="control"
+    class="form-control"
+    [ngClass]="{
+      'is-invalid': control.touched && !control.valid,
+      'is-valid': control.touched && control.valid
+    }"
+  />
+  <div class="invalid-feedback">This field is required!</div>
+</div>

@@ -1,0 +1,23 @@
+<div class="mb-3">
+  <label class="fw-bold">{{ label }}</label>
+  <input
+    type="text"
+    [value]="value"
+    (input)="onChange($any($event.target).value)"
+    (blur)="onTouched(); blur.emit()"
+    [disabled]="disabled"
+    class="form-control"
+    [ngClass]="{
+      'is-invalid': control && control.touched && !control.valid,
+      'is-valid': control && control.touched && control.valid
+    }"
+  />
+  <div
+    class="text-danger"
+    [ngClass]="
+      control && control.touched && !control.valid ? 'visible' : 'invisible'
+    "
+  >
+    This field is required!
+  </div>
+</div>
