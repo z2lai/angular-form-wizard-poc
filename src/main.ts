@@ -1,4 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/app.component';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { APP_ROUTES, App } from './app/app.component';
 
-bootstrapApplication(AppComponent);
+bootstrapApplication(App, {providers: [provideRouter(APP_ROUTES, withComponentInputBinding())]});

@@ -1,0 +1,186 @@
+<h2 class="display-6">
+  <b>Long Form 1 - Default Validation Behaviour</b>
+</h2>
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit(form)"
+  class="mt-5 border border-5 pt-3 pb-3 container needs-validation"
+  [ngClass]="{
+    'border-danger': form.touched && !form.valid,
+    'border-success': form.touched && form.valid
+  }"
+  novalidate
+>
+  @if (form.touched && !form.valid) { This form has errors:
+  {{ form.errors | json }}
+  }
+  <div class="text-secondary">
+    <b>Form Status:</b>
+    <span
+      [ngClass]="{
+        'text-danger': form.touched && !form.valid,
+        'text-success': form.touched && form.valid
+      }"
+    >
+      <!-- All value and validation statuses are updated when the form is created -->
+      {{ form.status }}
+    </span>
+
+    {{ form.touched ? 'touched' : 'untouched' }}
+    {{ form.dirty ? 'dirty' : 'pristine' }}
+    <button
+      type="button"
+      (click)="onMarkAllAsTouched(form)"
+      class="btn btn-primary"
+    >
+      Mark All Touched
+    </button>
+    <br />
+    <b>Form Value: </b>
+    <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
+    {{ form.value | json }}
+    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It  only shows errors defined at its own form group level -->
+    @if (!form.valid) { | <b>form Errors: </b> {{ form.errors | json }}}
+  </div>
+
+  <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
+
+  <ng-container formArrayName="issues">
+    <ng-container *ngFor="let issueForm of issues.controls; let i = index">
+      <form
+        class="mt-3 border border-3 pt-3 pb-3 container"
+        [formGroup]="issueForm"
+        (ngSubmit)="onSubmit(issueForm)"
+        [ngClass]="{
+          'border-danger': issueForm.touched && !issueForm.valid,
+          'border-success': issueForm.touched && issueForm.valid
+        }"
+      >
+        <header class="row">
+          <h3 style="height: 47px" class="display-6">
+            Issue {{ i + 1 }}
+            @if (issueForm.pending) {
+            <div class="ms-3 spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            } @else if (issueForm.touched && issueForm.valid) {
+            <span class="badge bg-success ms-3">Eligible</span>
+            } @else if (issueForm.touched && !issueForm.valid) {
+            <span class="badge bg-danger ms-3">Ineligible</span>
+            }
+          </h3>
+          <div class="text-secondary">
+            <b>issueForm Status:</b>
+            <span
+              [ngClass]="{
+                'text-danger': issueForm.touched && !issueForm.valid,
+                'text-success': issueForm.touched && issueForm.valid
+              }"
+            >
+              <!-- All value and validation statuses are updated when the issueForm is created -->
+              {{ issueForm.status }}
+            </span>
+            {{ issueForm.touched ? 'touched' : 'untouched' }}
+            {{ issueForm.dirty ? 'dirty' : 'pristine' }}
+            <button
+              type="button"
+              (click)="onMarkAllAsTouched(issueForm)"
+              class="btn btn-primary"
+            >
+              Mark All Touched
+            </button>
+            <br />
+            <b>issueForm Value: </b>
+            <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
+            {{ issueForm.value | json }}
+            <!-- Note that even though a issueForm group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
+            @if (!issueForm.valid) {<br /><b>issueForm Errors: </b>
+            {{ issueForm.errors | json }}
+            }
+          </div>
+        </header>
+
+        <div class="row mt-3">
+          <app-text-field-cva formControlName="issueType"></app-text-field-cva>
+          <!-- <div
+            *ngIf="
+              issueForm.get('eligibilityValidators')?.touched &&
+              !issueForm.get('eligibilityValidators')?.valid
+            "
+            class="text-danger"
+          > -->
+          <!-- @if ( issueForm.get('eligibilityValidators')?.hasError('issueType')
+            ) {
+            {{ issueForm.get('eligibilityValidators')?.getError('issueType') }}
+            } @if (
+            issueForm.get('eligibilityValidators')?.hasError('issueEligibility')
+            ) {
+            {{
+              issueForm
+                .get('eligibilityValidators')
+                ?.getError('issueEligibility')
+            }}
+            } -->
+          <!-- <div>
+            <button
+              type="button"
+              style="width: 136px"
+              class="btn btn-primary mt-3"
+              (click)="onCheckEligibility(issueForm)"
+            >
+              @if (issueForm.pending) {
+              <div
+                class="spinner-border spinner-border-sm text-light"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              } @else { Check Eligibility }
+            </button>
+          </div> -->
+          <div
+            [ngClass]="
+              issueForm.touched && !issueForm.valid ? 'visible' : 'invisible'
+            "
+            class="text-danger"
+          >
+            @if ( issueForm.hasError('issueType') ) {
+            {{ issueForm.getError('issueType') }}
+            } @else if ( issueForm.hasError('issueEligibility') ) {
+            {{ issueForm.getError('issueEligibility') }}
+            } @else {
+            <span class="invisible">placeholder</span>
+            }
+          </div>
+        </div>
+
+        <!-- <section>
+          <h6 class="display-6">Eligibility Questions</h6>
+          <app-profile controlKey="eligibility"></app-profile>
+        </section> -->
+      </form>
+    </ng-container>
+  </ng-container>
+
+  <div class="d-flex justify-content-between">
+    <button type="button" class="btn btn-light mt-3" (click)="addIssue()">
+      Add Issue
+    </button>
+    <button type="submit" style="width: 90px" class="btn btn-primary mt-3">
+      @if (form.pending) {
+      <div class="spinner-border spinner-border-sm text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      } @else { Continue }
+    </button>
+  </div>
+</form>
+
+<!-- <section class="mt-5 container">
+  <h3>Goals</h3> - Moved to Readme
+  <p>
+  </p>
+  <ol>
+  </ol>
+</section> -->
