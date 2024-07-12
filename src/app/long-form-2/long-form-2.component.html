@@ -12,9 +12,6 @@
   }"
   novalidate
 >
-  @if (form.touched && !form.valid) { This form has errors:
-  {{ form.errors | json }}
-  }
   <div class="text-secondary">
     <b>Form Status:</b>
     <span
@@ -40,8 +37,8 @@
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
     {{ form.value | json }}
-    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It  only shows errors defined at its own form group level -->
-    @if (!form.valid) { | <b>form Errors: </b> {{ form.errors | json }}}
+    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
+    @if (!form.valid) {<br /><b>Form Errors: </b> {{ form.errors | json }}}
   </div>
 
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
@@ -61,17 +58,23 @@
           <h3 style="height: 47px" class="display-6">
             Issue {{ i + 1 }}
             @if (issueForm.pending) {
-            <div class="ms-3 spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            } @else if (issueForm.touched && issueForm.valid) {
-            <span class="badge bg-success ms-3">Eligible</span>
-            } @else if (issueForm.touched && !issueForm.valid) {
-            <span class="badge bg-danger ms-3">Ineligible</span>
+              <div class="ms-3 spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            } @else if (
+              issueForm.get('eligibilityValidators')?.touched &&
+              issueForm.get('eligibilityValidators')?.valid 
+            ) {
+              <span class="badge bg-success ms-3">Eligible</span>
+            } @else if (
+              issueForm.get('eligibilityValidators')?.touched &&
+              !issueForm.get('eligibilityValidators')?.valid 
+            ) {
+              <span class="badge bg-danger ms-3">Ineligible</span>
             }
           </h3>
           <div class="text-secondary">
-            <b>issueForm Status:</b>
+            <b>Issue Status:</b>
             <span
               [ngClass]="{
                 'text-danger': issueForm.touched && !issueForm.valid,
@@ -91,38 +94,40 @@
               Mark All Touched
             </button>
             <br />
-            <b>issueForm Value: </b>
+            <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
             <!-- Note that even though a issueForm group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
-            @if (!issueForm.valid) {<br /><b>issueForm Errors: </b>
-            {{ issueForm.errors | json }}
+            @if (!issueForm.get('eligibilityValidators')?.valid) {
+              <br /><b>Eligibility Check Errors:</b><br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
             }
           </div>
         </header>
 
         <div class="row mt-3">
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
-          <!-- <div
-            *ngIf="
+          <div
+            [ngClass]="
               issueForm.get('eligibilityValidators')?.touched &&
-              !issueForm.get('eligibilityValidators')?.valid
+              !issueForm.get('eligibilityValidators')?.valid 
+                ? 'visible' 
+                : 'invisible'
             "
             class="text-danger"
-          > -->
-          <!-- @if ( issueForm.get('eligibilityValidators')?.hasError('issueType')
-            ) {
-            {{ issueForm.get('eligibilityValidators')?.getError('issueType') }}
-            } @if (
-            issueForm.get('eligibilityValidators')?.hasError('issueEligibility')
-            ) {
-            {{
-              issueForm
-                .get('eligibilityValidators')
-                ?.getError('issueEligibility')
-            }}
-            } -->
-          <!-- <div>
+          >
+            @if (issueForm.get('eligibilityValidators')?.hasError('issueType')) {
+              <span>{{ issueForm.get('eligibilityValidators')?.getError('issueType') }}</span>
+            } 
+            @else if (issueForm.get('eligibilityValidators')?.hasError('issueEligibility')) {
+              <span>
+                {{issueForm.get('eligibilityValidators')?.getError('issueEligibility')}}
+              </span>
+            } 
+            @else {
+              <span class="invisible">placeholder</span>
+            }
+          </div>
+          <div>
             <button
               type="button"
               style="width: 136px"
@@ -130,16 +135,19 @@
               (click)="onCheckEligibility(issueForm)"
             >
               @if (issueForm.pending) {
-              <div
-                class="spinner-border spinner-border-sm text-light"
-                role="status"
-              >
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              } @else { Check Eligibility }
+                <div
+                  class="spinner-border spinner-border-sm text-light"
+                  role="status"
+                >
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              } 
+              @else { 
+                <span>Check Eligibility</span> 
+              }
             </button>
-          </div> -->
-          <div
+          </div>
+          <!-- <div
             [ngClass]="
               issueForm.touched && !issueForm.valid ? 'visible' : 'invisible'
             "
@@ -152,7 +160,7 @@
             } @else {
             <span class="invisible">placeholder</span>
             }
-          </div>
+          </div> -->
         </div>
 
         <!-- <section>
@@ -177,10 +185,34 @@
   </div>
 </form>
 
-<!-- <section class="mt-5 container">
-  <h3>Goals</h3> - Moved to Readme
+<section class="mt-5 container">
+  <h3>Notes</h3>
   <p>
+    In this version, the backend validation (async) of each Issue sub form is separated out into a manual button click,
+    instead of triggering onBlur together with the frontend validation (sync) on the input.
+    How can we display to the user the different UI states for each of these actions?
+  </p>
+  <p>
+    <b>UI States and State Transitions</b>:
   </p>
   <ol>
+    <li>
+      <b>Initial State</b>: UI state starts out with an empty form with no status.
+    </li>
+    <li>
+      <b>Initial State -> Input Changed:</b>
+      When input is changed (and blurred), frontend validation is triggered and the input displays Valid status.
+    </li>
+    <li>
+      <b>Input Changed -> Check Eligibility Clicked:</b>
+      When Check Eligibility button is clicked, backend validation is triggered and form displays Eligibility status.
+      <br>
+      <b>Initial State -> Check Eligibility Clicked:</b>
+      If done from the initial state, this also triggers the frontend validation and displays valid status on the input if not already done.
+    </li>
+    <li>
+      <b>Check Eligibility Clicked -> Input Changed:</b>
+      Then, if the input is changed again after Check Eligibility button is clicked, ...
+    </li>
   </ol>
-</section> -->
+</section>

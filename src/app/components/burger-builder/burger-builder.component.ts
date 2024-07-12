@@ -12,7 +12,7 @@ import {
   NG_VALUE_ACCESSOR,
   ValidationErrors,
 } from '@angular/forms';
-import { VeganMenuValidator } from '../validators';
+// import { VeganMenuValidator } from '../../validators';
 
 export type BurgerBuild = {
   bun: 'Pretzel' | 'Ciabatta';
@@ -115,7 +115,7 @@ export class BurgerBuilderComponent implements ControlValueAccessor {
 
   // source code for curious people
   // https://github.com/angular/angular/blob/d2c83ea81b60366d1ef23e0b1c8c4abff0354a0e/packages/forms/src/model.ts#L602
-  validate(control: FormControl<BurgerBuild>): ValidationErrors | null {
-    return VeganMenuValidator(control);
-  }
+  // validate(control: FormControl<BurgerBuild>): ValidationErrors | null {
+  //   return VeganMenuValidator(control);
+  // }
 }

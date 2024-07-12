@@ -1,36 +1,25 @@
 import { Component, DoCheck, OnInit } from '@angular/core';
 import 'zone.js';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { TextFieldCvaComponent } from '../text-field-cva/text-field-cva.component';
-import { ProfileCvaComponent } from '../profile-cva/profile-cva.component';
-import { ProfileComponent } from '../profile/profile.component';
-import { TextFieldComponent } from '../text-field/text-field.component';
-import { IntermediateComponent } from '../intermediate/intermediate.component';
-import { issueEligibilityValidator, issueTypeValidator } from '../validators';
+import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
+import { issueEligibilityValidator, issueTypeValidator } from './validators';
 
 @Component({
   selector: 'app-long-form-1',
   standalone: true,
   imports: [
     CommonModule,
-    TextFieldComponent,
     TextFieldCvaComponent,
-    ProfileComponent,
-    ProfileCvaComponent,
     ReactiveFormsModule,
-    FormsModule,
-    IntermediateComponent,
   ],
   templateUrl: './long-form-1.component.html',
 })
@@ -40,7 +29,9 @@ export class LongForm1Component implements OnInit, DoCheck {
       // testInput: this.fb.control<string>(''),
       issues: this.fb.array([], { updateOn: 'submit' }),
     }
-    // { updateOn: 'submit' } // this option applies to all child AbstractControls and thus is overwritten by any children's updateOn option. Parent (but not sibling) AbstractControl's values and validations are always updated at the same time as child AbstractControls.
+    // This option applies to all child AbstractControls and thus is overwritten by any children's updateOn option. 
+    // Parent (but not sibling) AbstractControl's values and validations are always updated at the same time as child AbstractControls.
+    // { updateOn: 'submit' } 
   );
   issues: FormArray<FormGroup> = this.form.get('issues') as FormArray;
   lifecycleTicks: number = 0;
@@ -65,13 +56,14 @@ export class LongForm1Component implements OnInit, DoCheck {
             updateOn: 'blur',
           }),
           // eligibilityValidators: this.fb.control('', {
+          //   validators: [issueTypeValidator],
           //   asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+          //   updateOn: 'submit',
           // }),
         },
         {
           validators: [issueTypeValidator],
           asyncValidators: [issueEligibilityValidator],
-          updateOn: 'submit',
         }
       )
     );

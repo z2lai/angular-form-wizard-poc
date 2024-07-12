@@ -12,9 +12,6 @@
   }"
   novalidate
 >
-  @if (form.touched && !form.valid) { This form has errors:
-  {{ form.errors | json }}
-  }
   <div class="text-secondary">
     <b>Form Status:</b>
     <span
@@ -40,8 +37,8 @@
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
     {{ form.value | json }}
-    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It  only shows errors defined at its own form group level -->
-    @if (!form.valid) { | <b>form Errors: </b> {{ form.errors | json }}}
+    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
+    @if (!form.valid) {<br /><b>Form Errors: </b> {{ form.errors | json }}}
   </div>
 
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
@@ -71,7 +68,7 @@
             }
           </h3>
           <div class="text-secondary">
-            <b>issueForm Status:</b>
+            <b>Issue Status:</b>
             <span
               [ngClass]="{
                 'text-danger': issueForm.touched && !issueForm.valid,
@@ -91,7 +88,7 @@
               Mark All Touched
             </button>
             <br />
-            <b>issueForm Value: </b>
+            <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
             <!-- Note that even though a issueForm group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->

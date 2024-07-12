@@ -10,9 +10,9 @@ import { LongForm2Component } from "./long-form-2/long-form-2.component";
     template: `
       <h1>Angular 18 Form Wizard (Multi-Item/Multi-Step) - Long-form Approach</h1>
       <nav>
-        <a routerLink="/long-form-1">Long Form 1</a>
+        <a routerLink="/long-form-1" routerLinkActive="text-dark fw-bold">Long Form 1</a>
         <br />
-        <a routerLink="/long-form-2">Long Form 2</a>
+        <a routerLink="/long-form-2" routerLinkActive="text-dark fw-bold">Long Form 2</a>
       </nav>
       <hr />
       <router-outlet />
@@ -20,6 +20,7 @@ import { LongForm2Component } from "./long-form-2/long-form-2.component";
   })
   export class App { }
   
+  // Note that URL does not update in Preview mode, open Preview in New tab to see URL updates
   export const APP_ROUTES: Route[] = [
     {
       path: 'long-form-1',
