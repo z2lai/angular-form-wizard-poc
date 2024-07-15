@@ -8,14 +8,16 @@ import { LongForm2Component } from "./long-form-2/long-form-2.component";
     standalone: true,
     imports: [RouterModule],
     template: `
-      <h1>Angular 18 Form Wizard (Multi-Item/Multi-Step) - Long-form Approach</h1>
-      <nav>
-        <a routerLink="/long-form-1" routerLinkActive="text-dark fw-bold">Long Form 1</a>
-        <br />
-        <a routerLink="/long-form-2" routerLinkActive="text-dark fw-bold">Long Form 2</a>
-      </nav>
-      <hr />
-      <router-outlet />
+      <div class="container">
+        <h1>Angular 18 Form Wizard (Multi-Item/Multi-Step) - Long-form Approach</h1>
+        <nav>
+          <a routerLink="/long-form-1" routerLinkActive="text-dark fw-bold">Long Form 1</a>
+          <br />
+          <a routerLink="/long-form-2" routerLinkActive="text-dark fw-bold">Long Form 2</a>
+        </nav>
+        <hr />
+        <router-outlet />
+      </div>
     `,
   })
   export class App { }
