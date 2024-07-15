@@ -54,6 +54,8 @@
           'border-success': issueForm.touched && issueForm.valid
         }"
       >
+        <!-- Note the border formatting is based on the form validity which is independent of the Eligibility when isEligibilityChecked = false -->
+        <!-- You need both form green border and eligible badge to show that form is both valid and eligible. -->
         <header class="row">
           <h3 style="height: 47px" class="display-6">
             Issue {{ i + 1 }}
@@ -61,15 +63,9 @@
               <div class="ms-3 spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
-            } @else if (
-              issueForm.get('eligibilityValidators')?.touched &&
-              issueForm.get('eligibilityValidators')?.valid 
-            ) {
+            } @else if (shouldShowAsEligible(issueForm)) {
               <span class="badge bg-success ms-3">Eligible</span>
-            } @else if (
-              issueForm.get('eligibilityValidators')?.touched &&
-              !issueForm.get('eligibilityValidators')?.valid 
-            ) {
+            } @else if (shouldShowAsIneligible(issueForm)) {
               <span class="badge bg-danger ms-3">Ineligible</span>
             }
           </h3>
@@ -115,10 +111,16 @@
             "
             class="text-danger"
           >
-            @if (issueForm.get('eligibilityValidators')?.hasError('issueType')) {
+            @if (
+              issueForm.get('eligibilityValidators')?.value &&
+              issueForm.get('eligibilityValidators')?.hasError('issueType')
+            ) {
               <span>{{ issueForm.get('eligibilityValidators')?.getError('issueType') }}</span>
             } 
-            @else if (issueForm.get('eligibilityValidators')?.hasError('issueEligibility')) {
+            @else if (
+              issueForm.get('eligibilityValidators')?.value &&
+              issueForm.get('eligibilityValidators')?.hasError('issueEligibility')
+            ) {
               <span>
                 {{issueForm.get('eligibilityValidators')?.getError('issueEligibility')}}
               </span>
@@ -188,16 +190,84 @@
 <section class="mt-5 container">
   <h3>Notes</h3>
   <p>
-    In this version, the backend validation (async) of each Issue sub form is separated out into a manual button click,
-    instead of triggering onBlur together with the frontend validation (sync) on the input.
-    How can we display to the user the different UI states for each of these actions?
+    In this version, the backend validation of each Issue sub form is separated out into a manual button click,
+    instead of triggering onBlur together with the frontend validation on the input.
+    How can we display to the user the different validation states for each of these events?
+    <br>
+    <b>Note:</b> Frontend validation refers to form validation such as "required" validation which happens synchronously.
+    Backend validation refers to business rules validation such as validating the Eligibility of the issue on the backend
+    according to domain rules, which happens asynchronously.
+    <br>
+    <b>Note:</b> <s>For our business/UX requirements, backend validation can only be triggered if frontend validation is updated and passing to avoid unnecessary calls.</s>
+    Backend validation can only be passing if frontend validation is also passing.
   </p>
   <p>
-    <b>UI States and State Transitions</b>:
+    <b>Validation States (and Mapped Views)</b>:
   </p>
   <ol>
     <li>
-      <b>Initial State</b>: UI state starts out with an empty form with no status.
+      <b>Initial State:</b> Untouched Empty Form Initial State (Clean Form)
+    </li>
+    <li>
+      Frontend validation UPDATED and FAILING, backend validation NOT UPDATED, validation result is irrelevant (Form with Red Input)
+    </li>
+    <li>
+      Frontend validation UPDATED and PASSING, backend validation NOT UPDATED, validation result is irrelevant (Form with Green Input)
+    </li>
+    <li>
+      Frontend validation UPDATED and FAILING, backend validation UPDATED and FAILING (Form with Red Input and Ineligible Badge)
+    </li>
+    <li>
+      Frontend validation UPDATED and PASSING, backend validation UPDATED and FAILING (Form with Green Input and Ineligible Badge)
+    </li>
+    <li>
+      Frontend validation UPDATED and PASSING, backend validation UPDATED and PASSING (Form with Green input and Eligible Badge)
+    </li>
+  </ol>
+  <p>
+    We can implement the above state variables in code (Angular Reactive Forms API) as follows:
+  </p>
+  <ul>
+    <li>
+      Frontend validation NOT UPDATED/UPDATED -> <b>Parent Issue Form Touched</b> = false/true (will always be true after the first onblur event since it form validation updates automatically on blur of any input)
+    </li>
+    <li>
+      Frontend validation FAILING/PASSING -> <b>Parent Issue Form Valid</b> = false/true
+    </li>
+    <li>
+      Backend validation NOT UPDATED/UPDATED -> <b>Eligibility Checked Flag</b> = false/true (initial value is true since Form will trigger all validators on load, changes to false whenver any form value changes onBlur, changes back to true whenver Check Eligibility button is clicked)
+    </li>
+    <li>
+      Backend validation FAILING/PASSING -> <b>Validator Control Valid</b> = false/true
+    </li>
+  </ul>
+  <p>
+    <b>Validation States Transitions (and the triggering Events/Actions mapped on each State)</b> - convert this into a State Chart diagram:
+  </p>
+  <ol>
+    <li>#1 -- Input Blur --> #2</li>
+    <li>#1 -- Input Change with Input Blur --> #3</li>
+    <li> 
+      <s>#1 -- Button Click --> #2 (backend validation does not update here since frontend validation will fail)</s> 
+      <br>
+      1. We can remove this redundant state transition to simplify the UX by disabling this action in state #1.
+      <br>
+      2. Or we can add a new state: Frontend validation UPDATED and FAILING, backend validation UPDATED and FAILING (Form with Red Input and Ineligible Badge).
+      <br>
+      <b>Conclusion:</b> We should add a new state (#4) since the former option requires adding yet another state variable to track.
+    </li>
+    <li>#1 -- Button Click --> #4</li>
+    <li>#2 -- Input Change with Input Blur --> #3 (and vice versa)</li>
+    <li>#2 -- Button Click --> #4</li>
+    <li>#3 -- Input Change with Input Blur --> #2 (and vice versa)</li>
+    <li>#3 -- Button Click --> #5 or #6</li>
+    <li>#4 has all the same transitions as #2</li>
+    <li>#5 -- Input Change with Input Blur --> #2 or #3</li>
+    <li>#6 -- Input Change with Input Blur --> #2 or #3</li>
+  </ol>
+  <!-- <ol>
+    <li>
+      <b>Clean Form (Initial State)</b>: UI state starts out with an empty form with no status.
     </li>
     <li>
       <b>Initial State -> Input Changed:</b>
@@ -214,5 +284,5 @@
       <b>Check Eligibility Clicked -> Input Changed:</b>
       Then, if the input is changed again after Check Eligibility button is clicked, ...
     </li>
-  </ol>
+  </ol> -->
 </section>

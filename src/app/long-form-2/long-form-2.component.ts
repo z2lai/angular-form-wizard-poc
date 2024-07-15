@@ -40,7 +40,9 @@ export class LongForm2Component implements OnInit, DoCheck {
 
   ngOnInit(): void {
     this.addIssue();
-    this.form.valueChanges.subscribe((formValue) => console.log(formValue));
+    this.form.valueChanges.subscribe((formValue) => {
+      console.log(formValue);
+    });
   }
 
   ngDoCheck() {
@@ -48,36 +50,54 @@ export class LongForm2Component implements OnInit, DoCheck {
   }
 
   addIssue() {
-    this.issues.push(
-      this.fb.group(
-        {
-          issueType: this.fb.control<string | null>('', {
-            validators: Validators.required,
-            updateOn: 'blur',
-          }),
-          eligibilityValidators: this.fb.control('', {
-            validators: [issueTypeValidator],
-            asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
-            updateOn: 'submit',
-          }),
-        },
-        // {
-        //   validators: [issueTypeValidator],
-        //   asyncValidators: [issueEligibilityValidator],
-        //   updateOn: 'submit',
-        // }
-      )
+    const newIssue = this.fb.group(
+      {
+        issueType: this.fb.control<string | null>('a', {
+          validators: Validators.required,
+          updateOn: 'blur',
+        }),
+        eligibilityValidators: this.fb.control(null, {
+          validators: [issueTypeValidator],
+          asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+          updateOn: 'submit',
+        }),
+        isEligibilityChecked: this.fb.control(false),
+      },
+      // {
+      //   validators: [issueTypeValidator],
+      //   asyncValidators: [issueEligibilityValidator],
+      //   updateOn: 'submit',
+      // }
     );
+    newIssue.get('issueType')?.valueChanges.subscribe((formValue) => {
+      // debugger;
+      newIssue.get('isEligibilityChecked')?.setValue(false)
+      console.log(formValue);
+    });
+    this.issues.push(newIssue);
     console.log(this.form);
   }
 
   onCheckEligibility(issueForm: FormGroup) {
     if (issueForm.pending) return;
-
-    (
-      issueForm.get('eligibilityValidators') as FormControl
-    ).updateValueAndValidity();
+// debugger;
+    (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
+    (issueForm.get('isEligibilityChecked') as FormControl).setValue(true);
     issueForm.markAllAsTouched();
+  }
+
+  shouldShowAsEligible(issueForm: FormGroup): boolean {
+    let showEligible = issueForm.get('isEligibilityChecked')?.value &&
+      issueForm.get('eligibilityValidators')?.valid;
+    console.log(showEligible);
+    return showEligible;
+  }
+
+  shouldShowAsIneligible(issueForm: FormGroup): boolean {
+    let showEligible = issueForm.get('isEligibilityChecked')?.value &&
+      !issueForm.get('eligibilityValidators')?.valid;
+    console.log(showEligible);
+    return showEligible;
   }
 
   onSubmit(form: FormGroup): void {
