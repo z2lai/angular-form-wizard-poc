@@ -7,6 +7,18 @@ import {
 } from '@angular/forms';
 import { Observable, catchError, delay, map, of } from 'rxjs';
 
+export function allRequiredFieldsFilled(
+  control: AbstractControl
+): ValidationErrors | null {
+  if (!control.parent) {
+    return null;
+  }
+  const issueTypeValue = (control.parent.get('issueType') as FormControl).value;
+  return !issueTypeValue
+    ? { requiredFields: `issueType is required.` }
+    : null;
+}
+
 export function issueTypeValidator(
   control: AbstractControl
 ): ValidationErrors | null {
@@ -15,7 +27,7 @@ export function issueTypeValidator(
   }
   const issueTypeValue = (control.parent.get('issueType') as FormControl).value;
   // const issueTypeValue = (control.get('issueType') as FormControl).value;
-  return issueTypeValue.length < 5
+  return issueTypeValue && issueTypeValue.length < 5
     ? { issueType: `${issueTypeValue} is not a valid issue type.` }
     : null;
 }
@@ -41,17 +53,17 @@ export function issueEligibilityValidator(
   );
 }
 
-export function allRequiredFieldsFilled(
-  control: AbstractControl
-): ValidationErrors | null {
-  const controlValue = control.value;
-  let isValid;
-  if (controlValue) {
-    isValid =
-      controlValue.first &&
-      controlValue.last &&
-      controlValue.gender &&
-      (controlValue.gender !== 'Other' || controlValue.genderOther);
-  }
-  return isValid ? null : { allRequired: true };
-}
+// export function allRequiredFieldsFilled(
+//   control: AbstractControl
+// ): ValidationErrors | null {
+//   const controlValue = control.value;
+//   let isValid;
+//   if (controlValue) {
+//     isValid =
+//       controlValue.first &&
+//       controlValue.last &&
+//       controlValue.gender &&
+//       (controlValue.gender !== 'Other' || controlValue.genderOther);
+//   }
+//   return isValid ? null : { allRequired: true };
+// }

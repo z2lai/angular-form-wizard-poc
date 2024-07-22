@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
-import { issueEligibilityValidator, issueTypeValidator } from './validators';
+import { allRequiredFieldsFilled, issueEligibilityValidator, issueTypeValidator } from './validators';
 
 @Component({
   selector: 'app-long-form-2',
@@ -57,7 +57,7 @@ export class LongForm2Component implements OnInit, DoCheck {
           updateOn: 'blur',
         }),
         eligibilityValidators: this.fb.control(null, {
-          validators: [issueTypeValidator],
+          validators: [allRequiredFieldsFilled, issueTypeValidator],
           asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
           updateOn: 'submit',
         }),

@@ -112,13 +112,13 @@
             class="text-danger"
           >
             @if (
-              issueForm.get('eligibilityValidators')?.value &&
+              shouldShowAsIneligible(issueForm) &&
               issueForm.get('eligibilityValidators')?.hasError('issueType')
             ) {
               <span>{{ issueForm.get('eligibilityValidators')?.getError('issueType') }}</span>
             } 
             @else if (
-              issueForm.get('eligibilityValidators')?.value &&
+              shouldShowAsIneligible(issueForm) &&
               issueForm.get('eligibilityValidators')?.hasError('issueEligibility')
             ) {
               <span>
