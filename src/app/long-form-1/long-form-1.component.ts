@@ -51,6 +51,10 @@ export class LongForm1Component implements OnInit, DoCheck {
     this.issues.push(
       this.fb.group(
         {
+          isEligible: this.fb.control<boolean | null>(null, {
+            validators: Validators.required,
+            updateOn: 'change'
+          }),
           issueType: this.fb.control<string | null>('', {
             validators: Validators.required,
             updateOn: 'blur',
