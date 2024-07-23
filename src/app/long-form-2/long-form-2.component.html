@@ -190,10 +190,28 @@
 <section class="mt-5 container">
   <h3>Notes</h3>
   <p>
-    In this version, the backend validation of each Issue sub form is separated out into a manual button click,
-    instead of triggering onBlur together with the frontend validation on the input.
-    How can we display to the user the different validation states for each of these events?
+    In long-form-1, all validations (frontend and backend) are triggered together onblur of any input. 
+    This means all validity states are updated onblur of any input.
+    In this version, the backend validation (eligibility check) of each Issue sub form is separated out into a manual button click,
+    instead of triggering onBlur together with the frontend validation on the input (as seen in long-form-1).
     <br>
+    The business wants the UI to display different validation substates: One for issue eligibility (eligibility badge)
+    and one for overall form validity (how would this be displayed in the UI). However, it would be confusing to show
+    that the form is eligible while also invalid. So the suggested approach for handling this is either:
+  </p>
+  <ul>
+    <li>
+      <b>UX Approach 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
+      state for overall form validity such as a green border.
+    </li>
+    <li>
+      <b>UX Approach 2:</b>To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
+      need extra state variable to track hiding of the form validity when it's out-of-date (out of sync with inputs).
+      Although UX wants to show the feedback once the eligibility questions have been filled in which would be hard 
+      because the overall form would be invalid based on the required additional info questions.
+    </li>
+  </ul>
+  <p>
     <b>Note:</b> Frontend validation refers to form validation such as "required" validation which happens synchronously.
     Backend validation refers to business rules validation such as validating the Eligibility of the issue on the backend
     according to domain rules, which happens asynchronously.

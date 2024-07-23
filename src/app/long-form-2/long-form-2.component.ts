@@ -70,7 +70,7 @@ export class LongForm2Component implements OnInit, DoCheck {
       // }
     );
     newIssue.get('issueType')?.valueChanges.subscribe((formValue) => {
-      // debugger;
+// debugger;
       newIssue.get('isEligibilityChecked')?.setValue(false)
       console.log(formValue);
     });
@@ -101,6 +101,8 @@ export class LongForm2Component implements OnInit, DoCheck {
   }
 
   onSubmit(form: FormGroup): void {
+// debugger;
+    // TODO: Set all isEligibilityChecked FormControls to true to show the Eligibility badge for all issue forms
     this.updateFormValueAndValidity(form); // async because of event emitter
     form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
@@ -119,6 +121,7 @@ export class LongForm2Component implements OnInit, DoCheck {
         this.updateFormValueAndValidity(control);
       } else {
         control.updateValueAndValidity();
+        // TODO: Set all isEligibilityChecked FormControls to true to show the Eligibility badge for all issue forms
       }
     }
   }
