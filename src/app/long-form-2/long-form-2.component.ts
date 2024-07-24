@@ -11,15 +11,15 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
-import { allRequiredFieldsFilled, issueEligibilityValidator, issueTypeValidator } from './validators';
+import { requiredEligibilityFieldsValidator, eligibilityValidator, issueEligibilityValidator, issueTypeValidator } from './validators';
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
 
-interface IssueForm {
+export interface IssueForm {
   eligibility: FormGroup<EligibilityForm>;
   profile: FormGroup<ProfileForm | {}>;
 }
 
-interface EligibilityForm {
+export interface EligibilityForm {
   isEligible: FormControl<boolean | null>;
   issueType: FormControl<string>;
   eligibilityValidators: FormControl<null>;
@@ -76,8 +76,8 @@ export class LongForm2Component implements OnInit, DoCheck {
             updateOn: 'blur',
           }),
           eligibilityValidators: this.fb.control<null>(null, {
-            validators: [allRequiredFieldsFilled, issueTypeValidator],
-            asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+            validators: [requiredEligibilityFieldsValidator],
+            asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
             updateOn: 'submit',
           }),
           isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),

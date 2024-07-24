@@ -37,8 +37,9 @@
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
     {{ form.value | json }}
+    <br /><b>Form Errors: </b>
     <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
-    @if (!form.valid) {<br /><b>Form Errors: </b> {{ form.errors | json }}}
+    {{ form.errors | json }}
   </div>
 
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
@@ -93,14 +94,13 @@
             <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
-            <!-- Note that even though a issueForm group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
-            @if (!issueForm.get('eligibility.eligibilityValidators')?.valid) {
-              <br /><b>Eligibility Check Errors:</b><br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
-            }
+            <br /><b>Eligibility Check Errors:</b> 
+            <br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
           </div>
         </header>
 
         <section formGroupName="eligibility" class="row mt-3">
+          <h3 class="display-6">Eligibility Questions</h3>
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
           <div class="col mb-3">
