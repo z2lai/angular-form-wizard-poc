@@ -58,17 +58,8 @@
         <!-- Note the border formatting is based on the form validity which is independent of the Eligibility when isEligibilityChecked = false -->
         <!-- You need both form green border and eligible badge to show that form is both valid and eligible. -->
         <header class="row">
-          <h3 style="height: 47px" class="display-6">
+          <h3 class="display-6">
             Issue {{ i + 1 }}
-            @if (issueForm.pending) {
-              <div class="ms-3 spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            } @else if (shouldShowAsEligible(issueForm)) {
-              <span class="badge bg-success ms-3">Eligible</span>
-            } @else if (shouldShowAsIneligible(issueForm)) {
-              <span class="badge bg-danger ms-3">Ineligible</span>
-            }
           </h3>
           <div class="text-secondary">
             <b>Issue Status:</b>
@@ -98,7 +89,18 @@
         </header>
 
         <section formGroupName="eligibility" class="row mt-3">
-          <h3 class="display-6">Eligibility Questions</h3>
+          <h4 style="height: 30px">
+            Eligibility Questions
+            @if (issueForm.pending) {
+              <div class="ms-3 spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            } @else if (shouldShowAsEligible(issueForm)) {
+              <span class="badge bg-success ms-3">Eligible</span>
+            } @else if (shouldShowAsIneligible(issueForm)) {
+              <span class="badge bg-danger ms-3">Ineligible</span>
+            }
+          </h4>
           <div class="col text-secondary mb-3">
             <b>Eligibility Validator Errors:</b> 
             <br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
@@ -146,9 +148,9 @@
           >
             @if (
               shouldShowAsIneligible(issueForm) &&
-              issueForm.get('eligibility.eligibilityValidators')?.hasError('issueType')
+              issueForm.get('eligibility.eligibilityValidators')?.hasError('requiredFields')
             ) {
-              <span>{{ issueForm.get('eligibility.eligibilityValidators')?.getError('issueType') }}</span>
+              <span>{{ issueForm.get('eligibility.eligibilityValidators')?.getError('requiredFields') }}</span>
             } 
             @else if (
               shouldShowAsIneligible(issueForm) &&
@@ -200,7 +202,7 @@
         </section>
 
         <section class="row mt-3">
-          <h3 class="display-6">Additional Information</h3>
+          <h4>Additional Information</h4>
           <app-profile controlKey="profile"></app-profile>
         </section>
       </form>

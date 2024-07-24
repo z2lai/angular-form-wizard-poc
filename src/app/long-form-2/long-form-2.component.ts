@@ -100,11 +100,12 @@ export class LongForm2Component implements OnInit, DoCheck {
   }
 
   onCheckEligibility(issueForm: FormGroup<IssueForm>) {
-    if (issueForm.pending) return;
+    const eligibilityForm = issueForm.get('eligibility') as FormGroup<EligibilityForm>;
+    if (eligibilityForm.pending) return;
 
-    (issueForm.get('eligibility.eligibilityValidators') as FormControl).updateValueAndValidity();
-    (issueForm.get('eligibility.isEligibilityChecked') as FormControl).setValue(true);
-    issueForm.markAllAsTouched();
+    (eligibilityForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
+    (eligibilityForm.get('isEligibilityChecked') as FormControl).setValue(true);
+    eligibilityForm.markAllAsTouched();
   }
 
   shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
