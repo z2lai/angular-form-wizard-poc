@@ -7,6 +7,8 @@ import {
 } from '@angular/forms';
 import { Observable, catchError, delay, map, of } from 'rxjs';
 
+// Note: Parameter type must be of type AbstractControl as this function will be called with this type
+// and cannot automatically downcast to a subtype - will show error when calling fb.group(). 
 export function allRequiredFieldsFilled(
   control: AbstractControl
 ): ValidationErrors | null {
@@ -53,17 +55,3 @@ export function issueEligibilityValidator(
   );
 }
 
-// export function allRequiredFieldsFilled(
-//   control: AbstractControl
-// ): ValidationErrors | null {
-//   const controlValue = control.value;
-//   let isValid;
-//   if (controlValue) {
-//     isValid =
-//       controlValue.first &&
-//       controlValue.last &&
-//       controlValue.gender &&
-//       (controlValue.gender !== 'Other' || controlValue.genderOther);
-//   }
-//   return isValid ? null : { allRequired: true };
-// }

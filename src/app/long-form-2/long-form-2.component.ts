@@ -12,28 +12,42 @@ import {
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
 import { allRequiredFieldsFilled, issueEligibilityValidator, issueTypeValidator } from './validators';
+import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
+
+interface IssueForm {
+  eligibility: FormGroup<EligibilityForm>;
+  profile: FormGroup<ProfileForm | {}>;
+}
+
+interface EligibilityForm {
+  isEligible: FormControl<boolean | null>;
+  issueType: FormControl<string>;
+  eligibilityValidators: FormControl<null>;
+  isEligibilityChecked: FormControl<boolean>;
+}
 
 @Component({
   selector: 'app-long-form-2',
   standalone: true,
   imports: [
     CommonModule,
-    TextFieldCvaComponent,
     ReactiveFormsModule,
+    TextFieldCvaComponent,
+    ProfileComponent
   ],
   templateUrl: './long-form-2.component.html',
 })
 export class LongForm2Component implements OnInit, DoCheck {
-  form: FormGroup = this.fb.group(
+  form = this.fb.group(
     {
       // testInput: this.fb.control<string>(''),
-      issues: this.fb.array([], { updateOn: 'submit' }),
+      issues: this.fb.array<FormGroup<IssueForm>>([], { updateOn: 'submit' }),
     }
     // This option applies to all child AbstractControls and thus is overwritten by any children's updateOn option. 
     // Parent (but not sibling) AbstractControl's values and validations are always updated at the same time as child AbstractControls.
     // { updateOn: 'submit' }
   );
-  issues: FormArray<FormGroup> = this.form.get('issues') as FormArray;
+  issues = this.form.get('issues') as FormArray<FormGroup<IssueForm>>;
   lifecycleTicks: number = 0;
 
   constructor(public fb: FormBuilder) {}
@@ -50,63 +64,70 @@ export class LongForm2Component implements OnInit, DoCheck {
   }
 
   addIssue() {
-    const newIssue = this.fb.group(
-      {
-        isEligible: this.fb.control<boolean | null>(null, {
-          validators: Validators.required,
-          updateOn: 'change'
-        }),
-        issueType: this.fb.control<string | null>('a', {
-          validators: Validators.required,
-          updateOn: 'blur',
-        }),
-        eligibilityValidators: this.fb.control(null, {
-          validators: [allRequiredFieldsFilled, issueTypeValidator],
-          asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
-          updateOn: 'submit',
-        }),
-        isEligibilityChecked: this.fb.control(false),
-      },
-      // {
-      //   validators: [issueTypeValidator],
-      //   asyncValidators: [issueEligibilityValidator],
-      //   updateOn: 'submit',
-      // }
-    );
-    newIssue.get('issueType')?.valueChanges.subscribe((formValue) => {
-// debugger;
-      newIssue.get('isEligibilityChecked')?.setValue(false)
+    const newIssue = this.fb.group<IssueForm>({
+      eligibility: this.fb.group<EligibilityForm>(
+        {
+          isEligible: this.fb.control<boolean | null>(null, {
+            validators: Validators.required,
+            updateOn: 'change'
+          }),
+          issueType: this.fb.nonNullable.control<string>('', {
+            validators: Validators.required,
+            updateOn: 'blur',
+          }),
+          eligibilityValidators: this.fb.control<null>(null, {
+            validators: [allRequiredFieldsFilled, issueTypeValidator],
+            asyncValidators: [issueEligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+            updateOn: 'submit',
+          }),
+          isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
+        },
+        // {
+          //   validators: [issueTypeValidator],
+          //   asyncValidators: [issueEligibilityValidator],
+          //   updateOn: 'submit',
+          // }
+      ),
+      profile: this.fb.group({}),
+    });
+
+    (newIssue.get('eligibility.issueType') as FormControl).valueChanges.subscribe((formValue) => {
+      (newIssue.get('eligibility.isEligibilityChecked') as FormControl).setValue(false)
       console.log(formValue);
     });
     this.issues.push(newIssue);
     console.log(this.form);
   }
 
-  onCheckEligibility(issueForm: FormGroup) {
+  onCheckEligibility(issueForm: FormGroup<IssueForm>) {
     if (issueForm.pending) return;
-// debugger;
-    (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
-    (issueForm.get('isEligibilityChecked') as FormControl).setValue(true);
+
+    (issueForm.get('eligibility.eligibilityValidators') as FormControl).updateValueAndValidity();
+    (issueForm.get('eligibility.isEligibilityChecked') as FormControl).setValue(true);
     issueForm.markAllAsTouched();
   }
 
-  shouldShowAsEligible(issueForm: FormGroup): boolean {
-    let showEligible = issueForm.get('isEligibilityChecked')?.value &&
-      issueForm.get('eligibilityValidators')?.valid;
+  shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
+    let showEligible = (issueForm.get('eligibility.isEligibilityChecked') as FormControl)?.value &&
+      (issueForm.get('eligibility.eligibilityValidators') as FormControl)?.valid;
     console.log(showEligible);
+
     return showEligible;
   }
 
-  shouldShowAsIneligible(issueForm: FormGroup): boolean {
-    let showEligible = issueForm.get('isEligibilityChecked')?.value &&
-      !issueForm.get('eligibilityValidators')?.valid;
-    console.log(showEligible);
-    return showEligible;
+  shouldShowAsIneligible(issueForm: FormGroup<IssueForm>): boolean {
+    let showIneligible = (issueForm.get('eligibility.isEligibilityChecked') as FormControl).value &&
+      !(issueForm.get('eligibility.eligibilityValidators') as FormControl).valid;
+    console.log(showIneligible);
+
+    return showIneligible;
   }
 
   onSubmit(form: FormGroup): void {
-// debugger;
     // TODO: Set all isEligibilityChecked FormControls to true to show the Eligibility badge for all issue forms
+    
+    // Actually, I don't even know if I need to manually call update, 
+    // seems like the submit event triggers all updateOn: 'Submit' form controls
     this.updateFormValueAndValidity(form); // async because of event emitter
     form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
