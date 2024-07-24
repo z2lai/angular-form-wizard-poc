@@ -94,13 +94,15 @@
             <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
-            <br /><b>Eligibility Check Errors:</b> 
-            <br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
           </div>
         </header>
 
         <section formGroupName="eligibility" class="row mt-3">
           <h3 class="display-6">Eligibility Questions</h3>
+          <div class="col text-secondary mb-3">
+            <b>Eligibility Validator Errors:</b> 
+            <br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
+          </div>
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
           <div class="col mb-3">

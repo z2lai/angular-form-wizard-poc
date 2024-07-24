@@ -20,8 +20,8 @@ export interface IssueForm {
 }
 
 export interface EligibilityForm {
-  isEligible: FormControl<boolean | null>;
   issueType: FormControl<string>;
+  isEligible: FormControl<boolean | null>;
   eligibilityValidators: FormControl<null>;
   isEligibilityChecked: FormControl<boolean>;
 }
@@ -67,13 +67,13 @@ export class LongForm2Component implements OnInit, DoCheck {
     const newIssue = this.fb.group<IssueForm>({
       eligibility: this.fb.group<EligibilityForm>(
         {
-          isEligible: this.fb.control<boolean | null>(null, {
-            validators: Validators.required,
-            updateOn: 'change'
-          }),
           issueType: this.fb.nonNullable.control<string>('', {
             validators: Validators.required,
             updateOn: 'blur',
+          }),
+          isEligible: this.fb.control<boolean | null>(null, {
+            validators: Validators.required,
+            updateOn: 'change'
           }),
           eligibilityValidators: this.fb.control<null>(null, {
             validators: [requiredEligibilityFieldsValidator],
