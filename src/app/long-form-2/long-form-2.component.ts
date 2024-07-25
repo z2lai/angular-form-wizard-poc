@@ -16,14 +16,14 @@ import { ProfileComponent, ProfileForm } from '../components/profile/profile.com
 
 export interface IssueForm {
   eligibility: FormGroup<EligibilityForm>;
+  eligibilityValidators: FormControl<null>;
+  isEligibilityChecked: FormControl<boolean>;
   profile: FormGroup<ProfileForm | {}>;
 }
 
 export interface EligibilityForm {
   issueType: FormControl<string>;
   isEligible: FormControl<boolean | null>;
-  eligibilityValidators: FormControl<null>;
-  isEligibilityChecked: FormControl<boolean>;
 }
 
 @Component({
@@ -69,18 +69,11 @@ export class LongForm2Component implements OnInit, DoCheck {
         {
           issueType: this.fb.nonNullable.control<string>('', {
             validators: Validators.required,
-            updateOn: 'blur',
           }),
           isEligible: this.fb.control<boolean | null>(null, {
             validators: Validators.required,
             updateOn: 'change'
           }),
-          eligibilityValidators: this.fb.control<null>(null, {
-            validators: [requiredEligibilityFieldsValidator],
-            asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
-            updateOn: 'submit',
-          }),
-          isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
         },
         // {
           //   validators: [issueTypeValidator],
@@ -88,11 +81,18 @@ export class LongForm2Component implements OnInit, DoCheck {
           //   updateOn: 'submit',
           // }
       ),
+      eligibilityValidators: this.fb.control<null>(null, {
+        validators: [requiredEligibilityFieldsValidator],
+        asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+      }),
+      isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
       profile: this.fb.group({}),
-    });
+    },
+    { updateOn: 'blur' }
+    );
 
-    (newIssue.get('eligibility.issueType') as FormControl).valueChanges.subscribe((formValue) => {
-      (newIssue.get('eligibility.isEligibilityChecked') as FormControl).setValue(false)
+    (newIssue.get('eligibility') as FormGroup<EligibilityForm>).valueChanges.subscribe((formValue) => {
+      (newIssue.get('isEligibilityChecked') as FormControl).setValue(false)
       console.log(formValue);
     });
     this.issues.push(newIssue);
@@ -100,25 +100,24 @@ export class LongForm2Component implements OnInit, DoCheck {
   }
 
   onCheckEligibility(issueForm: FormGroup<IssueForm>) {
-    const eligibilityForm = issueForm.get('eligibility') as FormGroup<EligibilityForm>;
-    if (eligibilityForm.pending) return;
+    if (issueForm.pending) return;
 
-    (eligibilityForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
-    (eligibilityForm.get('isEligibilityChecked') as FormControl).setValue(true);
-    eligibilityForm.markAllAsTouched();
+    (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
+    (issueForm.get('isEligibilityChecked') as FormControl).setValue(true);
+    (issueForm.get('eligibility') as FormGroup<EligibilityForm>).markAllAsTouched();
   }
 
   shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
-    let showEligible = (issueForm.get('eligibility.isEligibilityChecked') as FormControl)?.value &&
-      (issueForm.get('eligibility.eligibilityValidators') as FormControl)?.valid;
+    let showEligible = (issueForm.get('isEligibilityChecked') as FormControl)?.value &&
+      (issueForm.get('eligibilityValidators') as FormControl)?.valid;
     console.log(showEligible);
 
     return showEligible;
   }
 
   shouldShowAsIneligible(issueForm: FormGroup<IssueForm>): boolean {
-    let showIneligible = (issueForm.get('eligibility.isEligibilityChecked') as FormControl).value &&
-      !(issueForm.get('eligibility.eligibilityValidators') as FormControl).valid;
+    let showIneligible = (issueForm.get('isEligibilityChecked') as FormControl).value &&
+      !(issueForm.get('eligibilityValidators') as FormControl).valid;
     console.log(showIneligible);
 
     return showIneligible;

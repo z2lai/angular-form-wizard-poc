@@ -7,24 +7,46 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { Observable, catchError, delay, map, of } from 'rxjs';
-import { EligibilityForm } from './long-form-2.component';
+import { EligibilityForm, IssueForm } from './long-form-2.component';
 
 // Note: Parameter type must be of type AbstractControl as this function will be called with this type
 // and cannot automatically downcast to a subtype - will show error when calling fb.group(). 
 export function requiredEligibilityFieldsValidator(
   control: AbstractControl
 ): ValidationErrors | null {
-  const parentForm = control.parent as FormGroup<EligibilityForm>;
+  const parentForm = control.parent as FormGroup<IssueForm>;
   if (!parentForm) {
     return of(null);
   }
-  
-  const issueType = (parentForm.get('issueType') as FormControl<string>).value;
-  const isEligible = (parentForm.get('isEligible') as FormControl<boolean | null>).value; 
+  debugger;
+  const issueType = (parentForm.get('eligibility.issueType') as FormControl<string>).value;
+  const isEligible = (parentForm.get('eligibility.isEligible') as FormControl<boolean | null>).value; 
 
   return !issueType || isEligible === null
     ? { requiredFields: `Fill in all required fields.` }
     : null;
+}
+
+export function eligibilityValidator(
+  control: AbstractControl
+): Observable<ValidationErrors | null> {
+  const parentForm = control.parent as FormGroup<IssueForm>;
+  if (!parentForm) {
+    return of(null);
+  }
+
+  const isEligible = (parentForm.get('eligibility.isEligible') as FormControl<boolean | null>).value;
+  return of(isEligible).pipe(
+    delay(1000),
+    map((isEligible) =>
+      !isEligible
+        ? {
+            issueEligibility: `This issue is not eligible.`,
+          }
+        : null
+    ),
+    catchError(() => of(null))
+  );
 }
 
 export function issueTypeValidator(
@@ -58,28 +80,6 @@ export function issueEligibilityValidator(
       issueTypeValue !== 'Request for Records'
         ? {
             issueEligibility: `This issue of type ${issueTypeValue} is not eligible.`,
-          }
-        : null
-    ),
-    catchError(() => of(null))
-  );
-}
-
-export function eligibilityValidator(
-  control: AbstractControl
-): Observable<ValidationErrors | null> {
-  const parentForm = control.parent as FormGroup<EligibilityForm>;
-  if (!parentForm) {
-    return of(null);
-  }
-
-  const isEligible = (parentForm.get('isEligible') as FormControl<boolean | null>).value;
-  return of(isEligible).pipe(
-    delay(1000),
-    map((isEligible) =>
-      !isEligible
-        ? {
-            issueEligibility: `This issue is not eligible.`,
           }
         : null
     ),
