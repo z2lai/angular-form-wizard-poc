@@ -58,8 +58,17 @@
         <!-- Note the border formatting is based on the form validity which is independent of the Eligibility when isEligibilityChecked = false -->
         <!-- You need both form green border and eligible badge to show that form is both valid and eligible. -->
         <header class="row">
-          <h3 class="display-6">
+          <h3 style="height: 47px" class="display-6">
             Issue {{ i + 1 }}
+            <!-- @if (issueForm.pending) {
+              <div class="ms-3 spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            } @else if (shouldShowAsEligible(issueForm)) {
+              <span class="badge bg-success ms-3">Eligible</span>
+            } @else if (shouldShowAsIneligible(issueForm)) {
+              <span class="badge bg-danger ms-3">Ineligible</span>
+            } -->
           </h3>
           <div class="text-secondary">
             <b>Issue Status:</b>
@@ -137,15 +146,7 @@
             </div>
           </div>
           
-          <div
-            [ngClass]="
-              issueForm.get('eligibilityValidators')?.touched &&
-              !issueForm.get('eligibilityValidators')?.valid 
-                ? 'visible' 
-                : 'invisible'
-            "
-            class="text-danger"
-          >
+          <div class="text-danger">
             @if (
               shouldShowAsIneligible(issueForm) &&
               issueForm.get('eligibilityValidators')?.hasError('requiredFields')
@@ -201,11 +202,11 @@
           </div> -->
         </section>
 
-        <section class="row mt-3">
-          <h4>Additional Information</h4>
-          <app-profile controlKey="profile"></app-profile>
-        </section>
-      </form>
+          <section class="row mt-3">
+            <h4>Additional Information</h4>
+            <app-profile controlKey="profile"></app-profile>
+          </section>
+              </form>
     </ng-container>
   </ng-container>
 
