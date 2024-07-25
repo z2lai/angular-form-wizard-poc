@@ -98,6 +98,15 @@ export class LongForm2Component implements OnInit, DoCheck {
       (newIssue.get('isEligibilityChecked') as FormControl).setValue(false)
       console.log(formValue);
     });
+    const subscriptionToShowProfileForm = (newIssue.get('eligibilityValidators') as FormControl)
+      .statusChanges
+      .subscribe(status => {
+        console.log('status:', status);
+        if (status === 'VALID') {
+          (newIssue.get('shouldShowProfileForm') as FormControl).setValue(true);
+          subscriptionToShowProfileForm.unsubscribe();
+        }
+      });
     this.issues.push(newIssue);
     console.log(this.form);
   }
@@ -112,18 +121,6 @@ export class LongForm2Component implements OnInit, DoCheck {
     // if ((issueForm.get('eligibilityValidators') as FormControl).valid) {
     //   (issueForm.get('shouldShowProfileForm') as FormControl).setValue(true);
     // }
-    // Just move this statusChanges subscription to FormGroup instantiation in addIssue
-    if (!(issueForm.get('shouldShowProfileForm') as FormControl<boolean>).value) {
-      (issueForm.get('eligibilityValidators') as FormControl).statusChanges.pipe(
-        first()
-      )
-      .subscribe(status => {
-        console.log('status:', status);
-        if (status === 'VALID') {
-          (issueForm.get('shouldShowProfileForm') as FormControl).setValue(true);
-        }
-      });
-    }
   }
 
   shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
@@ -141,14 +138,14 @@ export class LongForm2Component implements OnInit, DoCheck {
   onSubmit(form: FormGroup): void {
     // TODO: Set all isEligibilityChecked FormControls to true to show the Eligibility badge for all issue forms
     
-    // Actually, I don't even know if I need to manually call update, 
+    // TODO: Actually, I don't even know if I need to manually call update, 
     // seems like the submit event triggers all updateOn: 'Submit' form controls
     this.updateFormValueAndValidity(form); // async because of event emitter
     form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
 
     if (form.valid) {
-      // not triggered on the first time because updateFormValueAndValidity is async
+      // not triggered on the first time because emitted events to update parent form are async
       alert(form.value);
     }
   }
