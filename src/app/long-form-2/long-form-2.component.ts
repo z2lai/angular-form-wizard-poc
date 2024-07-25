@@ -133,7 +133,7 @@ export class LongForm2Component implements OnInit, DoCheck {
     console.log('Marked form as touched:', form);
 
     if (form.valid) {
-      // not triggered because updateFormValueAndValidity is async
+      // not triggered on the first time because updateFormValueAndValidity is async
       alert(form.value);
     }
   }

@@ -103,7 +103,7 @@
           </h4>
           <div class="col text-secondary mb-3">
             <b>Eligibility Validator Errors:</b> 
-            <br />{{ issueForm.get('eligibility.eligibilityValidators')?.errors | json }}
+            <br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
           </div>
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
@@ -139,8 +139,8 @@
           
           <div
             [ngClass]="
-              issueForm.get('eligibility.eligibilityValidators')?.touched &&
-              !issueForm.get('eligibility.eligibilityValidators')?.valid 
+              issueForm.get('eligibilityValidators')?.touched &&
+              !issueForm.get('eligibilityValidators')?.valid 
                 ? 'visible' 
                 : 'invisible'
             "
@@ -148,16 +148,16 @@
           >
             @if (
               shouldShowAsIneligible(issueForm) &&
-              issueForm.get('eligibility.eligibilityValidators')?.hasError('requiredFields')
+              issueForm.get('eligibilityValidators')?.hasError('requiredFields')
             ) {
-              <span>{{ issueForm.get('eligibility.eligibilityValidators')?.getError('requiredFields') }}</span>
+              <span>{{ issueForm.get('eligibilityValidators')?.getError('requiredFields') }}</span>
             } 
             @else if (
               shouldShowAsIneligible(issueForm) &&
-              issueForm.get('eligibility.eligibilityValidators')?.hasError('issueEligibility')
+              issueForm.get('eligibilityValidators')?.hasError('issueEligibility')
             ) {
               <span>
-                {{issueForm.get('eligibility.eligibilityValidators')?.getError('issueEligibility')}}
+                {{issueForm.get('eligibilityValidators')?.getError('issueEligibility')}}
               </span>
             } 
             @else {

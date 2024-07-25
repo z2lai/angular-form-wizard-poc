@@ -21,7 +21,6 @@ export function requiredEligibilityFieldsValidator(
   debugger;
   const issueType = (parentForm.get('eligibility.issueType') as FormControl<string>).value;
   const isEligible = (parentForm.get('eligibility.isEligible') as FormControl<boolean | null>).value; 
-
   return !issueType || isEligible === null
     ? { requiredFields: `Fill in all required fields.` }
     : null;
@@ -40,9 +39,7 @@ export function eligibilityValidator(
     delay(1000),
     map((isEligible) =>
       !isEligible
-        ? {
-            issueEligibility: `This issue is not eligible.`,
-          }
+        ? { issueEligibility: `This issue is not eligible.` }
         : null
     ),
     catchError(() => of(null))
