@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
-import { requiredEligibilityFieldsValidator, eligibilityValidator, issueEligibilityValidator, issueTypeValidator } from './validators';
+import { requiredEligibilityFieldsValidator, eligibilityValidator } from './validators';
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
 import { first, tap } from 'rxjs';
 

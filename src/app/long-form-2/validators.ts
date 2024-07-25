@@ -46,40 +46,40 @@ export function eligibilityValidator(
   );
 }
 
-export function issueTypeValidator(
-  control: AbstractControl
-): ValidationErrors | null {
-  const parentForm = control.parent as FormGroup<EligibilityForm>;
-  if (!parentForm) {
-    return of(null);
-  }
+// export function issueTypeValidator(
+//   control: AbstractControl
+// ): ValidationErrors | null {
+//   const parentForm = control.parent as FormGroup<EligibilityForm>;
+//   if (!parentForm) {
+//     return of(null);
+//   }
 
-  const issueType = (parentForm.get('issueType') as FormControl<string>).value;
-  // const issueTypeValue = (control.get('issueType') as FormControl).value;
-  return issueType && issueType.length < 5
-    ? { issueType: `${issueType} is not a valid issue type.` }
-    : null;
-}
+//   const issueType = (parentForm.get('issueType') as FormControl<string>).value;
+//   // const issueTypeValue = (control.get('issueType') as FormControl).value;
+//   return issueType && issueType.length < 5
+//     ? { issueType: `${issueType} is not a valid issue type.` }
+//     : null;
+// }
 
-export function issueEligibilityValidator(
-  control: AbstractControl
-): Observable<ValidationErrors | null> {
-  const parentForm = control.parent as FormGroup<EligibilityForm>;
-  if (!parentForm) {
-    return of(null);
-  }
+// export function issueEligibilityValidator(
+//   control: AbstractControl
+// ): Observable<ValidationErrors | null> {
+//   const parentForm = control.parent as FormGroup<EligibilityForm>;
+//   if (!parentForm) {
+//     return of(null);
+//   }
 
-  const issueType = (parentForm.get('issueType') as FormControl<string>).value;
-  // const issueTypeValue = (control.get('issueType') as FormControl).value;
-  return of(issueType).pipe(
-    delay(1000),
-    map((issueTypeValue) =>
-      issueTypeValue !== 'Request for Records'
-        ? {
-            issueEligibility: `This issue of type ${issueTypeValue} is not eligible.`,
-          }
-        : null
-    ),
-    catchError(() => of(null))
-  );
-}
+//   const issueType = (parentForm.get('issueType') as FormControl<string>).value;
+//   // const issueTypeValue = (control.get('issueType') as FormControl).value;
+//   return of(issueType).pipe(
+//     delay(1000),
+//     map((issueTypeValue) =>
+//       issueTypeValue !== 'Request for Records'
+//         ? {
+//             issueEligibility: `This issue of type ${issueTypeValue} is not eligible.`,
+//           }
+//         : null
+//     ),
+//     catchError(() => of(null))
+//   );
+// }
