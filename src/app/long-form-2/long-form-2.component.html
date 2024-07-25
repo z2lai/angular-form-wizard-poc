@@ -202,11 +202,13 @@
           </div> -->
         </section>
 
+        @if (issueForm.get('shouldShowProfileForm')?.value) {
           <section class="row mt-3">
             <h4>Additional Information</h4>
             <app-profile controlKey="profile"></app-profile>
           </section>
-              </form>
+        }
+      </form>
     </ng-container>
   </ng-container>
 

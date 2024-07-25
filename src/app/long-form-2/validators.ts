@@ -18,7 +18,7 @@ export function requiredEligibilityFieldsValidator(
   if (!parentForm) {
     return of(null);
   }
-  debugger;
+
   const issueType = (parentForm.get('eligibility.issueType') as FormControl<string>).value;
   const isEligible = (parentForm.get('eligibility.isEligible') as FormControl<boolean | null>).value; 
   return !issueType || isEligible === null

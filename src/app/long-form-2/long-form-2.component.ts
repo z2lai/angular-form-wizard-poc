@@ -13,11 +13,13 @@ import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
 import { requiredEligibilityFieldsValidator, eligibilityValidator, issueEligibilityValidator, issueTypeValidator } from './validators';
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
+import { first, tap } from 'rxjs';
 
 export interface IssueForm {
   eligibility: FormGroup<EligibilityForm>;
   eligibilityValidators: FormControl<null>;
   isEligibilityChecked: FormControl<boolean>;
+  shouldShowProfileForm: FormControl<boolean>;
   profile: FormGroup<ProfileForm | {}>;
 }
 
@@ -86,6 +88,7 @@ export class LongForm2Component implements OnInit, DoCheck {
         asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
       }),
       isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
+      shouldShowProfileForm: this.fb.nonNullable.control<boolean>(false),
       profile: this.fb.group({}),
     },
     { updateOn: 'blur' }
@@ -105,21 +108,33 @@ export class LongForm2Component implements OnInit, DoCheck {
     (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
     (issueForm.get('isEligibilityChecked') as FormControl).setValue(true);
     (issueForm.get('eligibility') as FormGroup<EligibilityForm>).markAllAsTouched();
+    // Doesn't work because of async validation
+    // if ((issueForm.get('eligibilityValidators') as FormControl).valid) {
+    //   (issueForm.get('shouldShowProfileForm') as FormControl).setValue(true);
+    // }
+    // Just move this statusChanges subscription to FormGroup instantiation in addIssue
+    if (!(issueForm.get('shouldShowProfileForm') as FormControl<boolean>).value) {
+      (issueForm.get('eligibilityValidators') as FormControl).statusChanges.pipe(
+        first()
+      )
+      .subscribe(status => {
+        console.log('status:', status);
+        if (status === 'VALID') {
+          (issueForm.get('shouldShowProfileForm') as FormControl).setValue(true);
+        }
+      });
+    }
   }
 
   shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
     let showEligible = (issueForm.get('isEligibilityChecked') as FormControl)?.value &&
       (issueForm.get('eligibilityValidators') as FormControl)?.valid;
-    console.log(showEligible);
-
     return showEligible;
   }
 
   shouldShowAsIneligible(issueForm: FormGroup<IssueForm>): boolean {
     let showIneligible = (issueForm.get('isEligibilityChecked') as FormControl).value &&
       !(issueForm.get('eligibilityValidators') as FormControl).valid;
-    console.log(showIneligible);
-
     return showIneligible;
   }
 
