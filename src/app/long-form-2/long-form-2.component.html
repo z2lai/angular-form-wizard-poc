@@ -94,9 +94,25 @@
             <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
+            <br><b>Eligibility Validator Errors:</b> 
+            <br>{{ issueForm.get('eligibilityValidators')?.errors | json }}
           </div>
         </header>
 
+        <!-- Testing how submit event updates value and validity of controls with 'updateOn: submit' option
+          1. For all updateOn options, updateValueAndValidity is not called internally by any of the events unless the value in the input (view) has actually changed from the input in the model.
+            - For updateOn: 'submit', I just need to bind [formGroup] to the root form for the submit button click to update all nested form controls with this option
+            - https://stackoverflow.com/questions/57452687/angular-6-reactive-forms-updateon-submit-is-not-updating-value-after-submit	
+            - Note: Listening to ngSubmit or submit event in the template is not required.
+          2. On the other hand, changing the value programmatically using setValue DOES call updateValueAndValidity internally
+            - BUT, setValue does not change TOUCHED or PRISTINE status (seems like these can only be changed by events in the view) - touched changed onblur, pristine changed onchange
+            - I think Pristine/Dirty value is updated seprately and has no bearing on if updateValueAndValidity is called or how it is called.        
+        -->
+        <app-text-field-cva #fc formControlName="eligibilityValidators"></app-text-field-cva>
+        <button type="button" (click)="fc.control?.setValue('test')" class="btn btn-primary mt-3">SetValue</button>
+        <button type="button" (click)="fc.control?.markAllAsTouched()" class="btn btn-primary mt-3">Touch</button>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        
         <section formGroupName="eligibility" class="row mt-3">
           <h4 style="height: 30px">
             Eligibility Questions
@@ -110,10 +126,10 @@
               <span class="badge bg-danger ms-3">Ineligible</span>
             }
           </h4>
-          <div class="col text-secondary mb-3">
+          <!-- <div class="col text-secondary mb-3">
             <b>Eligibility Validator Errors:</b> 
             <br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
-          </div>
+          </div> -->
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
           <div class="col mb-3">
@@ -246,11 +262,11 @@
   </p>
   <ul>
     <li>
-      <b>UX Approach 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
+      <b>UX Option 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
       state for overall form validity such as a green border.
     </li>
     <li>
-      <b>UX Approach 2:</b> To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
+      <b>UX Option 2:</b> To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
       need extra state variable to track hiding of the form validity when it's out-of-date (out of sync with inputs).
       Although UX wants to show the feedback once the eligibility questions have been filled in which would be hard 
       because the overall form would be invalid based on the required additional info questions.

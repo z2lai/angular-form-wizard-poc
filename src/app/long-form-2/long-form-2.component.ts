@@ -13,11 +13,11 @@ import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
 import { requiredEligibilityFieldsValidator, eligibilityValidator } from './validators';
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
-import { first, tap } from 'rxjs';
+import { distinctUntilChanged, first, tap } from 'rxjs';
 
 export interface IssueForm {
   eligibility: FormGroup<EligibilityForm>;
-  eligibilityValidators: FormControl<null>;
+  eligibilityValidators: FormControl<string>;
   isEligibilityChecked: FormControl<boolean>;
   shouldShowProfileForm: FormControl<boolean>;
   profile: FormGroup<ProfileForm | {}>;
@@ -83,9 +83,10 @@ export class LongForm2Component implements OnInit, DoCheck {
           //   updateOn: 'submit',
           // }
       ),
-      eligibilityValidators: this.fb.control<null>(null, {
+      eligibilityValidators: this.fb.nonNullable.control<string>('d', {
         validators: [requiredEligibilityFieldsValidator],
         asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
+        updateOn: 'submit'
       }),
       isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
       shouldShowProfileForm: this.fb.nonNullable.control<boolean>(false),
@@ -100,6 +101,7 @@ export class LongForm2Component implements OnInit, DoCheck {
     });
     const subscriptionToShowProfileForm = (newIssue.get('eligibilityValidators') as FormControl)
       .statusChanges
+      .pipe(distinctUntilChanged())
       .subscribe(status => {
         console.log('status:', status);
         if (status === 'VALID') {
@@ -140,8 +142,8 @@ export class LongForm2Component implements OnInit, DoCheck {
     
     // TODO: Actually, I don't even know if I need to manually call update, 
     // seems like the submit event triggers all updateOn: 'Submit' form controls
-    this.updateFormValueAndValidity(form); // async because of event emitter
-    form.markAllAsTouched(); // async because of event emitter
+    // this.updateFormValueAndValidity(form); // async because of event emitter
+    // form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
 
     if (form.valid) {
