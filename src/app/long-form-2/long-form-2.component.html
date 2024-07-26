@@ -94,6 +94,8 @@
             <b>Issue Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
             {{ issueForm.value | json }}
+            <br><b>Eligibility Validator Errors:</b> 
+            <br>{{ issueForm.get('eligibilityValidators')?.errors | json }}
           </div>
         </header>
 
@@ -110,10 +112,10 @@
               <span class="badge bg-danger ms-3">Ineligible</span>
             }
           </h4>
-          <div class="col text-secondary mb-3">
+          <!-- <div class="col text-secondary mb-3">
             <b>Eligibility Validator Errors:</b> 
             <br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
-          </div>
+          </div> -->
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
           <div class="col mb-3">
@@ -246,11 +248,11 @@
   </p>
   <ul>
     <li>
-      <b>UX Approach 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
+      <b>UX Option 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
       state for overall form validity such as a green border.
     </li>
     <li>
-      <b>UX Approach 2:</b> To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
+      <b>UX Option 2:</b> To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
       need extra state variable to track hiding of the form validity when it's out-of-date (out of sync with inputs).
       Although UX wants to show the feedback once the eligibility questions have been filled in which would be hard 
       because the overall form would be invalid based on the required additional info questions.
