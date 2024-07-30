@@ -36,7 +36,7 @@
     <br />
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
-    {{ form.value | json }}
+    <!-- {{ form.value | json }} -->
     <br /><b>Form Errors: </b>
     <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
     {{ form.errors | json }}
@@ -71,7 +71,7 @@
             } -->
           </h3>
           <div class="text-secondary">
-            <b>Issue Status:</b>
+            <b>Status:</b>
             <span
               [ngClass]="{
                 'text-danger': issueForm.touched && !issueForm.valid,
@@ -91,9 +91,9 @@
               Mark All Touched
             </button>
             <br />
-            <b>Issue Value: </b>
+            <b>Value: </b>
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
-            {{ issueForm.value | json }}
+            <!-- {{ issueForm.value | json }} -->
             <br><b>Eligibility Validator Errors:</b> 
             <br>{{ issueForm.get('eligibilityValidators')?.errors | json }}
           </div>

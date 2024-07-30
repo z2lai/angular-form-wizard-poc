@@ -56,8 +56,9 @@ export class LongForm2Component implements OnInit, DoCheck {
 
   ngOnInit(): void {
     this.addIssue();
+    console.log(this.form);
     this.form.valueChanges.subscribe((formValue) => {
-      console.log(formValue);
+      console.log('Form Value OnInit:', formValue);
     });
   }
 
@@ -69,10 +70,10 @@ export class LongForm2Component implements OnInit, DoCheck {
     const newIssue = this.fb.group<IssueForm>({
       eligibility: this.fb.group<EligibilityForm>(
         {
-          issueType: this.fb.nonNullable.control<string>('', {
+          issueType: this.fb.nonNullable.control<string>('a', {
             validators: Validators.required,
           }),
-          isEligible: this.fb.control<boolean | null>(null, {
+          isEligible: this.fb.control<boolean | null>(true, {
             validators: Validators.required,
             updateOn: 'change'
           }),
@@ -97,27 +98,32 @@ export class LongForm2Component implements OnInit, DoCheck {
 
     (newIssue.get('eligibility') as FormGroup<EligibilityForm>).valueChanges.subscribe((formValue) => {
       (newIssue.get('isEligibilityChecked') as FormControl).setValue(false)
-      console.log(formValue);
     });
+
+    (newIssue.get('eligibilityValidators') as FormControl)
+      .valueChanges
+      .subscribe(_ => {
+        (newIssue.get('isEligibilityChecked') as FormControl).setValue(true);
+        console.log('Eligibility Validators Updated!');
+      })
+
     const subscriptionToShowProfileForm = (newIssue.get('eligibilityValidators') as FormControl)
       .statusChanges
       .pipe(distinctUntilChanged())
       .subscribe(status => {
-        console.log('status:', status);
+        console.log('Eligibility Status changed to:', status);
         if (status === 'VALID') {
           (newIssue.get('shouldShowProfileForm') as FormControl).setValue(true);
           subscriptionToShowProfileForm.unsubscribe();
         }
       });
     this.issues.push(newIssue);
-    console.log(this.form);
   }
 
   onCheckEligibility(issueForm: FormGroup<IssueForm>) {
     if (issueForm.pending) return;
 
     (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
-    (issueForm.get('isEligibilityChecked') as FormControl).setValue(true);
     (issueForm.get('eligibility') as FormGroup<EligibilityForm>).markAllAsTouched();
     // Doesn't work because of async validation
     // if ((issueForm.get('eligibilityValidators') as FormControl).valid) {
