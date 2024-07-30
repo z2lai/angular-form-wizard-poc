@@ -57,6 +57,8 @@ export class LongForm2Component implements OnInit, DoCheck {
   ngOnInit(): void {
     this.addIssue();
     console.log(this.form);
+    // Why does calling updateFormValueAndValidity without setTimeout only emit the PENDING state?
+    setTimeout(() => this.updateFormValueAndValidity(this.form), 0);
     this.form.valueChanges.subscribe((formValue) => {
       console.log('Form Value OnInit:', formValue);
     });
