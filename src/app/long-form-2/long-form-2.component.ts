@@ -58,9 +58,10 @@ export class LongForm2Component implements OnInit, DoCheck {
     this.addIssue();
     console.log(this.form);
     // Why does calling updateFormValueAndValidity without setTimeout only emit the PENDING state?
-    setTimeout(() => this.updateFormValueAndValidity(this.form), 0);
+    // See https://github.com/angular/angular/issues/14542
+    // setTimeout(() => this.updateFormValueAndValidity(this.form), 0);  
     this.form.valueChanges.subscribe((formValue) => {
-      console.log('Form Value OnInit:', formValue);
+      console.log('Form Value Updated:', formValue);
     });
   }
 
@@ -72,10 +73,10 @@ export class LongForm2Component implements OnInit, DoCheck {
     const newIssue = this.fb.group<IssueForm>({
       eligibility: this.fb.group<EligibilityForm>(
         {
-          issueType: this.fb.nonNullable.control<string>('a', {
+          issueType: this.fb.nonNullable.control<string>('', {
             validators: Validators.required,
           }),
-          isEligible: this.fb.control<boolean | null>(true, {
+          isEligible: this.fb.control<boolean | null>(null, {
             validators: Validators.required,
             updateOn: 'change'
           }),
@@ -91,6 +92,7 @@ export class LongForm2Component implements OnInit, DoCheck {
         asyncValidators: [eligibilityValidator], // async validation will only check issueTypeValidator and not sync validators from sibling controls
         // updateOn: 'submit' this updateOn option does not matter since none of these events are triggered if view value is the same as the model value - need to call updateValueAndValidity manually
       }),
+      //TODO: Consider checking _pendingDirty/_pendingValue instead of this form control to manage view state: https://angularindepth.com/posts/1143/a-thorough-exploration-of-angular-forms
       isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
       shouldShowProfileForm: this.fb.nonNullable.control<boolean>(false),
       profile: this.fb.group({}),
@@ -103,10 +105,11 @@ export class LongForm2Component implements OnInit, DoCheck {
     });
 
     (newIssue.get('eligibilityValidators') as FormControl)
-      .valueChanges
+      .statusChanges
       .subscribe(_ => {
         (newIssue.get('isEligibilityChecked') as FormControl).setValue(true);
         console.log('Eligibility Validators Updated!');
+        console.log(newIssue);
       })
 
     const subscriptionToShowProfileForm = (newIssue.get('eligibilityValidators') as FormControl)
@@ -125,6 +128,7 @@ export class LongForm2Component implements OnInit, DoCheck {
   onCheckEligibility(issueForm: FormGroup<IssueForm>) {
     if (issueForm.pending) return;
 
+    // TODO: Figure out why passing onlySelf: true into updateValueAndValidity still updates parent form groups
     (issueForm.get('eligibilityValidators') as FormControl).updateValueAndValidity();
     (issueForm.get('eligibility') as FormGroup<EligibilityForm>).markAllAsTouched();
     // Doesn't work because of async validation

@@ -1,5 +1,5 @@
 <div class="text-secondary">
-  <b>Profile Subform Status:</b>
+  <b>Subform Status:</b>
   <span
     [ngClass]="{
       'text-danger': form.touched && !form.valid,
@@ -8,7 +8,7 @@
   >
     {{ form.status }}
   </span>
-  @if (!form.valid) {{{ form.errors | json }}}
+  <!-- @if (!form.valid) {{{ form.errors | json }}} -->
   {{ form.touched ? 'touched' : 'untouched' }}
   {{ form.dirty ? 'dirty' : 'pristine' }}
   <button
@@ -18,11 +18,11 @@
   >
     Mark All Touched
   </button>
-  <button type="button" (click)="onUpdateValue()" class="btn btn-primary">
+  <!-- <button type="button" (click)="onUpdateValue()" class="btn btn-primary">
     Update Value and Validity
-  </button>
+  </button> -->
   <br />
-  <b>Profile Subform:</b> {{ form.value | json }}
+  <b>Subform Value:</b> {{ form.value | json }}
 </div>
 
 <div formGroupName="profile">

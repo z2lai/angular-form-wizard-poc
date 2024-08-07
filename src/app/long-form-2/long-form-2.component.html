@@ -214,7 +214,9 @@
           [ngClass]="{ 'd-none': !issueForm.get('shouldShowProfileForm')?.value }"
         >
           <h4>Additional Information</h4>
-          <app-profile controlKey="profile"></app-profile>
+          @if(issueForm.get('shouldShowProfileForm')?.value) {
+            <app-profile controlKey="profile"></app-profile>
+          }
         </section>
       </form>
     </ng-container>
