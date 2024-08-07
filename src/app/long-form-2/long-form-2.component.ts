@@ -20,6 +20,7 @@ export interface IssueForm {
   eligibilityValidators: FormControl<null>;
   isEligibilityChecked: FormControl<boolean>;
   shouldShowProfileForm: FormControl<boolean>;
+  shouldLockEligibilityForm: FormControl<boolean>;
   profile: FormGroup<ProfileForm | {}>;
 }
 
@@ -95,11 +96,15 @@ export class LongForm2Component implements OnInit, DoCheck {
       //TODO: Consider checking _pendingDirty/_pendingValue instead of this form control to manage view state: https://angularindepth.com/posts/1143/a-thorough-exploration-of-angular-forms
       isEligibilityChecked: this.fb.nonNullable.control<boolean>(false),
       shouldShowProfileForm: this.fb.nonNullable.control<boolean>(false),
+      shouldLockEligibilityForm: this.fb.nonNullable.control<boolean>(false),
       profile: this.fb.group({}),
     },
     { updateOn: 'blur' }
     );
 
+    // TODO: Since I have two different ways to set isEligibilityChecked to false, if input changed or Edit Info clicked
+    // I should make isEligibilityChecked into an observable stream within this component class for declarative code,
+    // but how would I use this since IsEligibilityChecked is currently in a FormControl.
     (newIssue.get('eligibility') as FormGroup<EligibilityForm>).valueChanges.subscribe((formValue) => {
       (newIssue.get('isEligibilityChecked') as FormControl).setValue(false)
     });
@@ -119,9 +124,24 @@ export class LongForm2Component implements OnInit, DoCheck {
         console.log('Eligibility Status changed to:', status);
         if (status === 'VALID') {
           (newIssue.get('shouldShowProfileForm') as FormControl).setValue(true);
-          subscriptionToShowProfileForm.unsubscribe();
+          // TODO: Right now imperatively managing the disabled property on each section, need to figure a declarative way
+          // (newIssue.get('eligibility') as FormGroup).disable();
+          (newIssue.get('shouldLockEligibilityForm') as FormControl).setValue(true);
+          // subscriptionToShowProfileForm.unsubscribe();
         }
       });
+
+    (newIssue.get('shouldLockEligibilityForm') as FormControl).valueChanges.subscribe((formValue) => {
+      console.log('shouldLockEligibilityForm', formValue);
+      if (formValue) {
+        (newIssue.get('eligibility') as FormGroup).disable();
+        (newIssue.get('profile') as FormGroup).enable();
+      } else {
+        (newIssue.get('eligibility') as FormGroup).enable();
+        (newIssue.get('profile') as FormGroup).disable();
+      }
+    });
+    
     this.issues.push(newIssue);
   }
 
@@ -137,12 +157,23 @@ export class LongForm2Component implements OnInit, DoCheck {
     // }
   }
 
+  onEditInformation(issueForm: FormGroup<IssueForm>) {
+    (issueForm.get('shouldLockEligibilityForm') as FormControl).setValue(false);
+  }
+
+  // TODO: Consider instead of getters, using another state variable to show as eligible
+  // Note: Eligibility formgroup should only be disabled (shouldLockEligibilityForm = true) when shouldShowAsEligible is true. 
   shouldShowAsEligible(issueForm: FormGroup<IssueForm>): boolean {
-    let showEligible = (issueForm.get('isEligibilityChecked') as FormControl)?.value &&
-      (issueForm.get('eligibilityValidators') as FormControl)?.valid;
+    // let showEligible = (issueForm.get('isEligibilityChecked') as FormControl)?.value &&
+    //   (issueForm.get('eligibilityValidators') as FormControl)?.valid;
+    // let showEligible = (issueForm.get('eligibility') as FormGroup)?.disabled
+    let showEligible = (issueForm.get('shouldLockEligibilityForm') as FormControl).value
+    console.log('showEligible', showEligible);
+    console.log(issueForm);
     return showEligible;
   }
 
+  //TODO: Consider instead of getters, using another state variable stored as a formcontrol to consolidate all state variables
   shouldShowAsIneligible(issueForm: FormGroup<IssueForm>): boolean {
     let showIneligible = (issueForm.get('isEligibilityChecked') as FormControl).value &&
       !(issueForm.get('eligibilityValidators') as FormControl).valid;
