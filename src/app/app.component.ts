@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { Route, RouterModule } from "@angular/router";
 import { LongForm1Component } from "./long-form-1/long-form-1.component";
 import { LongForm2Component } from "./long-form-2/long-form-2.component";
+import { FormWizardComponent } from "./form-wizard/form-wizard.component.";
 
 @Component({
     selector: 'app-root',
@@ -14,6 +15,8 @@ import { LongForm2Component } from "./long-form-2/long-form-2.component";
           <a routerLink="/long-form-1" routerLinkActive="text-dark fw-bold">Long Form 1</a>
           <br />
           <a routerLink="/long-form-2" routerLinkActive="text-dark fw-bold">Long Form 2</a>
+          <br />
+          <a routerLink="/form-wizard" routerLinkActive="text-dark fw-bold">Form Wizard</a>
         </nav>
         <hr />
         <router-outlet />
@@ -31,6 +34,10 @@ import { LongForm2Component } from "./long-form-2/long-form-2.component";
     {
       path: 'long-form-2',
       component: LongForm2Component,
+    },
+    {
+      path: 'form-wizard',
+      component: FormWizardComponent,
     },
     {
       path: '',
