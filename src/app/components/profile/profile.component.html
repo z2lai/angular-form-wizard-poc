@@ -23,9 +23,12 @@
   </button> -->
   <br />
   <b>Subform Value:</b> {{ form.value | json }}
+  <br /><b>Subform Errors: </b>
+  <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
+  {{ form.errors | json }}
 </div>
 
-<div formGroupName="profile">
+<div [formGroupName]="controlKey">
   <div class="row mt-3">
     <div class="col">
       <app-text-field-cva formControlName="first"> </app-text-field-cva>

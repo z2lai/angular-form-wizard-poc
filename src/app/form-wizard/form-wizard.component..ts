@@ -48,13 +48,13 @@ export class FormWizardComponent implements OnInit, DoCheck {
     // 2. On the other hand, changing the value programmatically using setValue DOES call updateValueAndValidity internally
     //   - BUT, setValue does not change TOUCHED or PRISTINE status (seems like these can only be changed by events in the view) - touched changed onblur, pristine changed onchange
     //   - I think Pristine/Dirty value is updated separately and has no bearing on if updateValueAndValidity is called or how it is called.
-    this.updateFormValueAndValidity(form); // async because of event emitter
+    // this.updateFormValueAndValidity(form); // async because of event emitter
     form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
 
     if (form.valid) {
       // not triggered on the first time because emitted events to update parent form are async
-      alert(form.value);
+      alert(JSON.stringify(form.value));
     }
   }
 

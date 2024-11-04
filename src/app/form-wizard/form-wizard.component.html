@@ -36,7 +36,7 @@
     <br />
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
-    <!-- {{ form.value | json }} -->
+    {{ form.value | json }}
     <br /><b>Form Errors: </b>
     <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
     {{ form.errors | json }}

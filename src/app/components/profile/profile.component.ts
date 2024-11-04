@@ -79,8 +79,8 @@ export class ProfileComponent {
       },
       { 
         validators: this.allRequiredFieldsFilled,
-        updateOn: 'blur', 
-      }
+        updateOn: 'change', 
+      },
     );
     this.parentFormGroup.setControl(this.controlKey, this.form);
   }
