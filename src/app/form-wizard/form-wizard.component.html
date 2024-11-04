@@ -1,0 +1,58 @@
+<h2 class="display-6">
+  <b>Form Wizard</b>
+</h2>
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit(form)"
+  class="mt-5 border border-5 pt-3 pb-3 container needs-validation"
+  novalidate
+>
+<!-- [ngClass]="{
+  'border-danger': form.touched && !form.valid,
+  'border-success': form.touched && form.valid
+}" -->
+  <div class="text-secondary">
+    <b>Form Status:</b>
+    <span
+      [ngClass]="{
+        'text-danger': form.touched && !form.valid && !form.disabled,
+        'text-success': form.touched && form.valid && !form.disabled
+      }"
+    >
+      <!-- All value and validation statuses are updated when the form is created -->
+      {{ form.status }}
+    </span>
+
+    {{ form.touched ? 'touched' : 'untouched' }}
+    {{ form.dirty ? 'dirty' : 'pristine' }}
+    <!-- <button
+      type="button"
+      (click)="onMarkAllAsTouched(form)"
+      class="btn btn-primary"
+    >
+      Mark All Touched
+    </button> -->
+    <br />
+    <b>Form Value: </b>
+    <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
+    <!-- {{ form.value | json }} -->
+    <br /><b>Form Errors: </b>
+    <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
+    {{ form.errors | json }}
+  </div>
+
+  <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
+  <h4 class="mt-3">Additional Information</h4>
+  <app-profile controlKey="issues"></app-profile>
+
+  <div class="d-flex justify-content-between">
+    <button type="submit" style="width: 90px" class="btn btn-primary mt-3">
+      @if (form.pending) {
+      <div class="spinner-border spinner-border-sm text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      } @else { Continue }
+    </button>
+  </div>
+</form>

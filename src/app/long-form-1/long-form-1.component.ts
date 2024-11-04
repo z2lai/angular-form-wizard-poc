@@ -11,7 +11,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
-import { issueEligibilityValidator, issueTypeValidator } from './validators';
+import { eligibilityValidator, requiredEligibilityFieldsValidator } from './validators';
 
 @Component({
   selector: 'app-long-form-1',
@@ -66,8 +66,8 @@ export class LongForm1Component implements OnInit, DoCheck {
           // }),
         },
         {
-          validators: [issueTypeValidator],
-          asyncValidators: [issueEligibilityValidator],
+          validators: [requiredEligibilityFieldsValidator],
+          asyncValidators: [eligibilityValidator],
         }
       )
     );

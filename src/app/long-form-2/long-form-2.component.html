@@ -6,18 +6,18 @@
   [formGroup]="form"
   (ngSubmit)="onSubmit(form)"
   class="mt-5 border border-5 pt-3 pb-3 container needs-validation"
-  [ngClass]="{
-    'border-danger': form.touched && !form.valid,
-    'border-success': form.touched && form.valid
-  }"
   novalidate
 >
+<!-- [ngClass]="{
+  'border-danger': form.touched && !form.valid,
+  'border-success': form.touched && form.valid
+}" -->
   <div class="text-secondary">
     <b>Form Status:</b>
     <span
       [ngClass]="{
-        'text-danger': form.touched && !form.valid,
-        'text-success': form.touched && form.valid
+        'text-danger': form.touched && !form.valid && !form.disabled,
+        'text-success': form.touched && form.valid && !form.disabled
       }"
     >
       <!-- All value and validation statuses are updated when the form is created -->
@@ -26,19 +26,20 @@
 
     {{ form.touched ? 'touched' : 'untouched' }}
     {{ form.dirty ? 'dirty' : 'pristine' }}
-    <button
+    <!-- <button
       type="button"
       (click)="onMarkAllAsTouched(form)"
       class="btn btn-primary"
     >
       Mark All Touched
-    </button>
+    </button> -->
     <br />
     <b>Form Value: </b>
     <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
-    {{ form.value | json }}
+    <!-- {{ form.value | json }} -->
+    <br /><b>Form Errors: </b>
     <!-- Note that even though a form group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
-    @if (!form.valid) {<br /><b>Form Errors: </b> {{ form.errors | json }}}
+    {{ form.errors | json }}
   </div>
 
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
@@ -49,17 +50,17 @@
         class="mt-3 border border-3 pt-3 pb-3 container"
         [formGroup]="issueForm"
         (ngSubmit)="onSubmit(issueForm)"
-        [ngClass]="{
-          'border-danger': issueForm.touched && !issueForm.valid,
-          'border-success': issueForm.touched && issueForm.valid
-        }"
       >
-        <!-- Note the border formatting is based on the form validity which is independent of the Eligibility when isEligibilityChecked = false -->
+      <!-- [ngClass]="{
+        'border-danger': issueForm.touched && !issueForm.valid,
+        'border-success': issueForm.touched && issueForm.valid
+      }" -->
+        <!-- Note the border formatting is based on the form validity which does not align with Eligibility when isEligibilityChecked = false -->
         <!-- You need both form green border and eligible badge to show that form is both valid and eligible. -->
         <header class="row">
           <h3 style="height: 47px" class="display-6">
             Issue {{ i + 1 }}
-            @if (issueForm.pending) {
+            <!-- @if (issueForm.pending) {
               <div class="ms-3 spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
@@ -67,14 +68,14 @@
               <span class="badge bg-success ms-3">Eligible</span>
             } @else if (shouldShowAsIneligible(issueForm)) {
               <span class="badge bg-danger ms-3">Ineligible</span>
-            }
+            } -->
           </h3>
           <div class="text-secondary">
-            <b>Issue Status:</b>
+            <b>Status:</b>
             <span
               [ngClass]="{
-                'text-danger': issueForm.touched && !issueForm.valid,
-                'text-success': issueForm.touched && issueForm.valid
+                'text-danger': issueForm.touched && !issueForm.valid && !issueForm.disabled,
+                'text-success': issueForm.touched && issueForm.valid && !issueForm.disabled
               }"
             >
               <!-- All value and validation statuses are updated when the issueForm is created -->
@@ -82,37 +83,65 @@
             </span>
             {{ issueForm.touched ? 'touched' : 'untouched' }}
             {{ issueForm.dirty ? 'dirty' : 'pristine' }}
-            <button
+            <!-- <button
               type="button"
               (click)="onMarkAllAsTouched(issueForm)"
               class="btn btn-primary"
             >
               Mark All Touched
-            </button>
-            <br />
-            <b>Issue Value: </b>
+            </button> -->
+            <!-- <br /> -->
+            <!-- <b>Value: </b> -->
             <!-- The following causes ExpressionChangedAfterItHasBeenCheckedError since child component modifies parent's state with setControl -->
-            {{ issueForm.value | json }}
-            <!-- Note that even though a issueForm group aggregates validity status of all child AbstractControls, it does not aggregate their errors. It only shows errors defined at its own form group level -->
-            @if (!issueForm.get('eligibilityValidators')?.valid) {
-              <br /><b>Eligibility Check Errors:</b><br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
-            }
+            <!-- {{ issueForm.value | json }} -->
+            <br><b>Eligibility Validator Errors:</b> 
+            <br>{{ issueForm.get('eligibilityValidators')?.errors | json }}
           </div>
         </header>
 
-        <div class="row mt-3">
+        <section formGroupName="eligibility" class="row mt-3">
+          <h4 style="height: 30px">
+            Eligibility Questions
+            @if (issueForm.pending) {
+              <div class="ms-3 spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            } @else if (shouldShowAsEligible(issueForm)) {
+              <span class="badge bg-success ms-3">Eligible</span>
+            } @else if (shouldShowAsIneligible(issueForm)) {
+              <span class="badge bg-danger ms-3">Ineligible</span>
+            }
+          </h4>
+          <div class="text-secondary">
+            <b>Subform Status:</b>
+            <span
+              [ngClass]="{
+                'text-danger': issueForm.get('eligibility')?.touched && !issueForm.get('eligibility')?.valid && !issueForm.get('eligibility')?.disabled,
+                'text-success': issueForm.get('eligibility')?.touched && issueForm.get('eligibility')?.valid && !issueForm.get('eligibility')?.disabled
+              }"
+            >
+              <!-- All value and validation statuses are updated when the issueForm is created -->
+              {{ issueForm.get('eligibility')?.status }}
+            </span>
+            {{ issueForm.get('eligibility')?.touched ? 'touched' : 'untouched' }}
+            {{ issueForm.get('eligibility')?.dirty ? 'dirty' : 'pristine' }}
+          </div>
+          <!-- <div class="col text-secondary mb-3">
+            <b>Eligibility Validator Errors:</b> 
+            <br />{{ issueForm.get('eligibilityValidators')?.errors | json }}
+          </div> -->
           <app-text-field-cva formControlName="issueType"></app-text-field-cva>
           
           <div class="col mb-3">
             <label class="fw-bold">Is Eligible?</label>
-            <select formControlName="isEligible" class="form-control mb-3"
+            <select formControlName="isEligible" class="form-select"
               [ngClass]="{
-                'is-invalid': issueForm.get('isEligible') && 
-                              (issueForm.get('isEligible')!.touched || issueForm.get('isEligible')!.dirty) && 
-                              !issueForm.get('isEligible')!.valid,
-                'is-valid': issueForm.get('isEligible') && 
-                            (issueForm.get('isEligible')!.touched || issueForm.get('isEligible')!.dirty) && 
-                            issueForm.get('isEligible')!.valid,
+                'is-invalid': issueForm.get('eligibility.isEligible') && 
+                              (issueForm.get('eligibility.isEligible')!.touched || issueForm.get('eligibility.isEligible')!.dirty) && 
+                              !issueForm.get('eligibility.isEligible')!.valid && !issueForm.get('eligibility.isEligible')!.disabled,
+                'is-valid': issueForm.get('eligibility.isEligible') && 
+                            (issueForm.get('eligibility.isEligible')!.touched || issueForm.get('eligibility.isEligible')!.dirty) && 
+                            issueForm.get('eligibility.isEligible')!.valid && !issueForm.get('eligibility.isEligible')!.disabled,
               }"
             >
               <option disabled [ngValue]="null">Select an Option...</option>
@@ -122,9 +151,10 @@
             <div
               class="text-danger"
               [ngClass]="
-                issueForm.get('isEligible') && 
-                issueForm.get('isEligible')!.touched && 
-                !issueForm.get('isEligible')!.valid 
+                issueForm.get('eligibility.isEligible') && 
+                issueForm.get('eligibility.isEligible')!.touched && 
+                !issueForm.get('eligibility.isEligible')!.valid &&
+                !issueForm.get('eligibility.isEligible')!.disabled
                   ? 'visible' 
                   : 'invisible'
               "
@@ -133,20 +163,12 @@
             </div>
           </div>
           
-          <div
-            [ngClass]="
-              issueForm.get('eligibilityValidators')?.touched &&
-              !issueForm.get('eligibilityValidators')?.valid 
-                ? 'visible' 
-                : 'invisible'
-            "
-            class="text-danger"
-          >
+          <div class="text-danger">
             @if (
               shouldShowAsIneligible(issueForm) &&
-              issueForm.get('eligibilityValidators')?.hasError('issueType')
+              issueForm.get('eligibilityValidators')?.hasError('requiredFields')
             ) {
-              <span>{{ issueForm.get('eligibilityValidators')?.getError('issueType') }}</span>
+              <span>{{ issueForm.get('eligibilityValidators')?.getError('requiredFields') }}</span>
             } 
             @else if (
               shouldShowAsIneligible(issueForm) &&
@@ -162,24 +184,35 @@
           </div>
 
           <div>
-            <button
-              type="button"
-              style="width: 136px"
-              class="btn btn-primary mt-3"
-              (click)="onCheckEligibility(issueForm)"
-            >
-              @if (issueForm.pending) {
-                <div
-                  class="spinner-border spinner-border-sm text-light"
-                  role="status"
-                >
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              } 
-              @else { 
-                <span>Check Eligibility</span> 
-              }
-            </button>
+            @if(!shouldShowAsEligible(issueForm)) {
+              <button
+                type="button"
+                style="width: 136px"
+                class="btn btn-primary mt-3"
+                (click)="onCheckEligibility(issueForm)"
+              >
+                @if (issueForm.pending) {
+                  <div
+                    class="spinner-border spinner-border-sm text-light"
+                    role="status"
+                  >
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                } 
+                @else { 
+                  <span>Check Eligibility</span> 
+                }
+              </button>
+            }
+            @else {
+              <button
+                type="button"
+                class="btn btn-primary mt-3"
+                (click)="onEditInformation(issueForm)"
+              >
+                Edit Information
+              </button>
+            }
           </div>
           <!-- <div
             [ngClass]="
@@ -195,12 +228,22 @@
             <span class="invisible">placeholder</span>
             }
           </div> -->
-        </div>
+        </section>
 
-        <!-- <section>
-          <h6 class="display-6">Eligibility Questions</h6>
-          <app-profile controlKey="eligibility"></app-profile>
-        </section> -->
+        <!-- @if (issueForm.get('shouldShowProfileForm')?.value) {
+          <section class="row mt-3">
+            <h4>Additional Information</h4>
+            <app-profile controlKey="profile"></app-profile>
+          </section>
+        } -->
+        <section class="row mt-3"
+          [ngClass]="{ 'd-none': !issueForm.get('shouldShowProfileForm')?.value }"
+        >
+          <h4>Additional Information</h4>
+          @if(issueForm.get('shouldShowProfileForm')?.value) {
+            <app-profile controlKey="profile"></app-profile>
+          }
+        </section>
       </form>
     </ng-container>
   </ng-container>
@@ -233,11 +276,11 @@
   </p>
   <ul>
     <li>
-      <b>UX Approach 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
+      <b>UX Option 1:</b> Make it clear that eligibility only applies to the eligibility questions, and there's a different UI
       state for overall form validity such as a green border.
     </li>
     <li>
-      <b>UX Approach 2:</b>To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
+      <b>UX Option 2:</b> To only show issue eligibility based on overall form validity - only updated on Check Eligibility click and Done click, 
       need extra state variable to track hiding of the form validity when it's out-of-date (out of sync with inputs).
       Although UX wants to show the feedback once the eligibility questions have been filled in which would be hard 
       because the overall form would be invalid based on the required additional info questions.

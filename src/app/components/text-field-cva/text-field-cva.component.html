@@ -8,14 +8,14 @@
     [disabled]="disabled"
     class="form-control"
     [ngClass]="{
-      'is-invalid': control && control.touched && !control.valid,
-      'is-valid': control && control.touched && control.valid
+      'is-invalid': control && control.touched && !control.valid && !disabled,
+      'is-valid': control && control.touched && control.valid && !disabled
     }"
   />
   <div
     class="text-danger"
     [ngClass]="
-      control && control.touched && !control.valid ? 'visible' : 'invisible'
+      control && control.touched && !control.valid && !disabled ? 'visible' : 'invisible'
     "
   >
     This field is required!

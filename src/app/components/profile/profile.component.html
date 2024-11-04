@@ -1,14 +1,14 @@
 <div class="text-secondary">
-  <b>Profile Subform Status:</b>
+  <b>Subform Status:</b>
   <span
     [ngClass]="{
-      'text-danger': form.touched && !form.valid,
-      'text-success': form.touched && form.valid
+      'text-danger': form.touched && !form.valid && !form.disabled,
+      'text-success': form.touched && form.valid && !form.disabled
     }"
   >
     {{ form.status }}
   </span>
-  @if (!form.valid) {{{ form.errors | json }}}
+  <!-- @if (!form.valid) {{{ form.errors | json }}} -->
   {{ form.touched ? 'touched' : 'untouched' }}
   {{ form.dirty ? 'dirty' : 'pristine' }}
   <button
@@ -18,15 +18,15 @@
   >
     Mark All Touched
   </button>
-  <button type="button" (click)="onUpdateValue()" class="btn btn-primary">
+  <!-- <button type="button" (click)="onUpdateValue()" class="btn btn-primary">
     Update Value and Validity
-  </button>
+  </button> -->
   <br />
-  <b>Profile Subform:</b> {{ form.value | json }}
+  <b>Subform Value:</b> {{ form.value | json }}
 </div>
 
 <div formGroupName="profile">
-  <div class="row">
+  <div class="row mt-3">
     <div class="col">
       <app-text-field-cva formControlName="first"> </app-text-field-cva>
     </div>
@@ -35,18 +35,36 @@
     </div>
   </div>
   <div class="row">
-    <div
-      class="col"
-      [ngClass]="{
-        'was-validated': genderControl && genderControl.touched
-      }"
-    >
-      <select formControlName="gender" class="form-select mb-3">
-        <option selected disabled value="">Select gender...</option>
+    <div class="col mb-3">
+      <label class="fw-bold">Gender</label>
+      <select formControlName="gender" class="form-select"
+        [ngClass]="{
+          'is-invalid': genderControl && 
+                        (genderControl.touched || genderControl.dirty) && 
+                        !genderControl.valid && !genderControl.disabled,
+          'is-valid': genderControl && 
+                      (genderControl.touched || genderControl.dirty) && 
+                      genderControl.valid && !genderControl.disabled,
+        }"
+      >
+        <option disabled value="">Select a gender...</option>
         <option *ngFor="let option of genderOptions" [value]="option">
           {{ option }}
         </option>
       </select>
+      <div
+        class="text-danger"
+        [ngClass]="
+          genderControl && 
+          genderControl.touched && 
+          !genderControl.valid &&
+          !genderControl.disabled
+            ? 'visible' 
+            : 'invisible'
+        "
+      >
+        This field is required!
+      </div>
     </div>
   </div>
   <ng-container *ngIf="form.value?.gender === 'Other'">

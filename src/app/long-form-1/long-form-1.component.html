@@ -103,7 +103,7 @@
 
           <div class="col mb-3">
             <label class="fw-bold">Is Eligible?</label>
-            <select formControlName="isEligible" class="form-control mb-3"
+            <select formControlName="isEligible" class="form-select mb-3"
               [ngClass]="{
                 'is-invalid': issueForm.get('isEligible') && 
                               (issueForm.get('isEligible')!.touched || issueForm.get('isEligible')!.dirty) && 
@@ -173,8 +173,8 @@
             "
             class="text-danger"
           >
-            @if ( issueForm.hasError('issueType') ) {
-            {{ issueForm.getError('issueType') }}
+            @if ( issueForm.hasError('requiredFields') ) {
+            {{ issueForm.getError('requiredFields') }}
             } @else if ( issueForm.hasError('issueEligibility') ) {
             {{ issueForm.getError('issueEligibility') }}
             } @else {

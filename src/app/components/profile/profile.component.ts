@@ -17,6 +17,13 @@ import {
 } from '@angular/forms';
 import { TextFieldCvaComponent } from '../text-field-cva/text-field-cva.component';
 
+export interface ProfileForm {
+  first: FormControl<string>;
+  last: FormControl<string>;
+  gender: FormControl<string>;
+  genderOther: FormControl<string>;
+}
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -33,7 +40,7 @@ import { TextFieldCvaComponent } from '../text-field-cva/text-field-cva.componen
 export class ProfileComponent {
   @Input() controlKey = '';
 
-  form!: FormGroup;
+  form!: FormGroup<ProfileForm>;
   genderOptions: string[] = [
     'Female',
     'Male',
@@ -59,12 +66,21 @@ export class ProfileComponent {
   ngOnInit(): void {
     this.form = this.fb.group(
       {
-        first: ['b', Validators.required],
-        last: ['c', Validators.required],
-        gender: ['Other', Validators.required],
-        genderOther: [''],
+        first: this.fb.nonNullable.control('', { validators: Validators.required }),
+        last: this.fb.nonNullable.control('', { validators: Validators.required }),
+        gender: this.fb.nonNullable.control(
+          '', 
+          { 
+            validators: Validators.required,
+            updateOn: 'change'
+          }),
+        // TODO: Implement conditional validator on genderOther control
+        genderOther: this.fb.nonNullable.control(''),
       },
-      { validators: this.allRequiredFieldsFilled }
+      { 
+        validators: this.allRequiredFieldsFilled,
+        updateOn: 'blur', 
+      }
     );
     this.parentFormGroup.setControl(this.controlKey, this.form);
   }
@@ -78,8 +94,10 @@ export class ProfileComponent {
     this.form.updateValueAndValidity();
   }
 
+  // Note: Parameter type must be of type AbstractControl as this function will be called with this type
+  // and cannot automatically downcast to a subtype - will show error when calling fb.group(). 
   allRequiredFieldsFilled(control: AbstractControl): ValidationErrors | null {
-    const controlValue = control.value;
+    const controlValue = (control as FormGroup<ProfileForm>).value;
     let isValid;
     if (controlValue) {
       isValid =
