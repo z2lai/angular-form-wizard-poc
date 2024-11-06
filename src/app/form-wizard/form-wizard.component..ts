@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, OnInit, QueryList, ViewChild, ViewChildren, inject } from '@angular/core';
 import 'zone.js';
 import {
   FormArray,
@@ -10,6 +10,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-cva.component';
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
+import { CustomWizardComponent } from './custom-wizard/custom-wizard.component';
+import { CdkStep } from '@angular/cdk/stepper';
 
 @Component({
   selector: 'form-wizard',
@@ -19,25 +21,70 @@ import { ProfileComponent, ProfileForm } from '../components/profile/profile.com
     ReactiveFormsModule,
     TextFieldCvaComponent,
     ProfileComponent,
+    CustomWizardComponent,
+    CdkStep
   ],
   templateUrl: './form-wizard.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormWizardComponent implements OnInit, DoCheck {
-  form = this.fb.group({
-    issues: this.fb.group({}),
-    parties: this.fb.group({}),
+export class FormWizardComponent implements OnInit, AfterViewChecked, DoCheck {
+  // Query this object in all the hooks to see what the values are
+  @ViewChildren(CdkStep) steps: QueryList<CdkStep> | undefined;
+
+  private readonly _fb = inject(FormBuilder);
+  private readonly _cdRef = inject(ChangeDetectorRef);
+  form = this._fb.group({
+    issues: this._fb.group({}),
+    parties: this._fb.group({}),
+    documents: this._fb.group({}),
   });
   lifecycleTicks: number = 0;
+  isLinear = true;
 
-  constructor(public fb: FormBuilder) {}
+  get issuesForm(): FormGroup {
+    return this.form.get('issues') as FormGroup;
+  }
+
+  get partiesForm(): FormGroup {
+    return this.form.get('parties') as FormGroup;
+  }
+
+  get documentsForm(): FormGroup {
+    return this.form.get('documents') as FormGroup;
+  }
 
   ngOnInit(): void {
-    console.log(this.form);
-    
+    console.log('On Init!');
+    console.log(this.form.getRawValue());
   }
 
   ngDoCheck() {
     console.log(++this.lifecycleTicks);
+  }
+
+  ngAfterContentInit() {
+    console.log('Content Initiated!');
+    console.log(this.form.getRawValue());
+  }
+
+  ngAfterContentChecked() {
+    console.log('Content Checked!');
+    console.log(this.form.getRawValue());
+  }
+
+  ngAfterViewInit() {
+    console.log('View Initiated!');
+    console.log(this.form.getRawValue());
+    this._cdRef.detectChanges(); // this post says its acceptable for complex use cases: https://www.reddit.com/r/Angular2/comments/1fxk7qc/comment/lqr84im/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+  }
+
+  ngAfterViewChecked() {
+    console.log('View Checked!');
+    console.log(this.form.getRawValue());
+    this.steps?.forEach((step) => {
+      console.log("step control:")
+      console.log(step.stepControl); // Log each input element
+    });
   }
 
   onSubmit(form: FormGroup): void {

@@ -40,7 +40,24 @@ export interface ProfileForm {
 export class ProfileComponent {
   @Input() controlKey = '';
 
-  form!: FormGroup<ProfileForm>;
+  form: FormGroup<ProfileForm> = this.fb.group(
+    {
+      first: this.fb.nonNullable.control('', { validators: Validators.required }),
+      last: this.fb.nonNullable.control('', { validators: Validators.required }),
+      gender: this.fb.nonNullable.control(
+        '', 
+        { 
+          validators: Validators.required,
+          updateOn: 'change'
+        }),
+      // TODO: Implement conditional validator on genderOther control
+      genderOther: this.fb.nonNullable.control(''),
+    },
+    { 
+      validators: this.allRequiredFieldsFilled,
+      updateOn: 'change', 
+    },
+  );
   genderOptions: string[] = [
     'Female',
     'Male',
@@ -64,24 +81,6 @@ export class ProfileComponent {
   }
 
   ngOnInit(): void {
-    this.form = this.fb.group(
-      {
-        first: this.fb.nonNullable.control('', { validators: Validators.required }),
-        last: this.fb.nonNullable.control('', { validators: Validators.required }),
-        gender: this.fb.nonNullable.control(
-          '', 
-          { 
-            validators: Validators.required,
-            updateOn: 'change'
-          }),
-        // TODO: Implement conditional validator on genderOther control
-        genderOther: this.fb.nonNullable.control(''),
-      },
-      { 
-        validators: this.allRequiredFieldsFilled,
-        updateOn: 'change', 
-      },
-    );
     this.parentFormGroup.setControl(this.controlKey, this.form);
   }
 

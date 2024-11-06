@@ -42,9 +42,22 @@
     {{ form.errors | json }}
   </div>
 
+  <app-custom-wizard [linear]="isLinear">
+    <cdk-step [stepControl]="issuesForm">
+      <h4 class="mt-3">Issues</h4>
+      <app-profile controlKey="issues"></app-profile>
+    </cdk-step>
+    <cdk-step [stepControl]="partiesForm">
+      <h4 class="mt-3">PARTIES</h4>
+      <form [formGroup]="partiesForm">
+      </form>
+    </cdk-step>
+    <cdk-step [stepControl]="documentsForm">
+      <h4 class="mt-3">DOCUMENTS</h4>
+    </cdk-step>
+  </app-custom-wizard>
+
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->
-  <h4 class="mt-3">Additional Information</h4>
-  <app-profile controlKey="issues"></app-profile>
 
   <div class="d-flex justify-content-between">
     <button type="submit" style="width: 90px" class="btn btn-primary mt-3">
