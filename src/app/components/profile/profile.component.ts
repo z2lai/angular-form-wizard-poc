@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
+  Output,
   inject,
 } from '@angular/core';
 import {
@@ -38,7 +40,7 @@ export interface ProfileForm {
   ],
 })
 export class ProfileComponent {
-  @Input() controlKey = '';
+  @Input() controlKey = ''; 
 
   form: FormGroup<ProfileForm> = this.fb.group(
     {
@@ -82,6 +84,14 @@ export class ProfileComponent {
 
   ngOnInit(): void {
     this.parentFormGroup.setControl(this.controlKey, this.form);
+    // setTimeout(()=> console.log('Timeout Event!'), 1); //this works only for default change detection
+
+    // this works to trigger CD but gives error on first formControlName "Cannot find control with path: 'issues -> first'"
+    // probably because child CVA controls are trying to find their CVA when it hasn't yet been attached to the parent form due to setTimeOut
+    // setTimeout(()=> {
+    //   this.parentFormGroup.setControl(this.controlKey, this.form);
+    //   console.log('trigger CD!');
+    // }, 1);
   }
 
   ngOnDestroy() {

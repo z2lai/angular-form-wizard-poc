@@ -12,6 +12,7 @@ import { TextFieldCvaComponent } from '../components/text-field-cva/text-field-c
 import { ProfileComponent, ProfileForm } from '../components/profile/profile.component';
 import { CustomWizardComponent } from './custom-wizard/custom-wizard.component';
 import { CdkStep } from '@angular/cdk/stepper';
+import { CustomWizardStepComponent } from './custom-wizard-step/custom-wizard-step.component';
 
 @Component({
   selector: 'form-wizard',
@@ -22,12 +23,14 @@ import { CdkStep } from '@angular/cdk/stepper';
     TextFieldCvaComponent,
     ProfileComponent,
     CustomWizardComponent,
-    CdkStep
+    CdkStep,
+    CustomWizardStepComponent
   ],
   templateUrl: './form-wizard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FormWizardComponent implements OnInit, AfterViewChecked, DoCheck {
+export class FormWizardComponent implements OnInit, DoCheck {
+  @ViewChild(CustomWizardComponent) wizard: CustomWizardComponent | undefined;
   // Query this object in all the hooks to see what the values are
   @ViewChildren(CdkStep) steps: QueryList<CdkStep> | undefined;
 
@@ -40,6 +43,10 @@ export class FormWizardComponent implements OnInit, AfterViewChecked, DoCheck {
   });
   lifecycleTicks: number = 0;
   isLinear = true;
+
+  get formStatusChanges() {
+    return this.form.valueChanges;
+  }
 
   get issuesForm(): FormGroup {
     return this.form.get('issues') as FormGroup;
@@ -62,29 +69,38 @@ export class FormWizardComponent implements OnInit, AfterViewChecked, DoCheck {
     console.log(++this.lifecycleTicks);
   }
 
-  ngAfterContentInit() {
-    console.log('Content Initiated!');
-    console.log(this.form.getRawValue());
-  }
+  // ngAfterContentInit() {
+  //   console.log('Content Initiated!');
+  //   console.log(this.form.getRawValue());
+  // }
 
-  ngAfterContentChecked() {
-    console.log('Content Checked!');
-    console.log(this.form.getRawValue());
-  }
+  // ngAfterContentChecked() {
+  //   console.log('Content Checked!');
+  //   console.log(this.form.getRawValue());
+  // }
 
   ngAfterViewInit() {
     console.log('View Initiated!');
     console.log(this.form.getRawValue());
-    this._cdRef.detectChanges(); // this post says its acceptable for complex use cases: https://www.reddit.com/r/Angular2/comments/1fxk7qc/comment/lqr84im/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-  }
-
-  ngAfterViewChecked() {
-    console.log('View Checked!');
-    console.log(this.form.getRawValue());
+    // Design to call detectChanges here seems fine because we're saying that there are expressions in this components view
+    // that have to be checked and updated manually once the entire view has been fully rendered (as there are no UI events to trigger CD).
+    // Furthermore, any future changes from child components can only be triggered by UI events so CD will be triggered in those cases to update parent view.
+    // Not that bad for performance if the view contains only OnPush components.
+    // this post from Angular core member Alexander says you should never call detectChanges: https://www.reddit.com/r/Angular2/comments/188amn0/is_there_a_good_edge_case_to_call_detectchanges/
+    // this._cdRef.detectChanges(); // this post says its acceptable for complex use cases: https://www.reddit.com/r/Angular2/comments/1fxk7qc/comment/lqr84im/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
     this.steps?.forEach((step) => {
       console.log("step control:")
       console.log(step.stepControl); // Log each input element
     });
+  }
+
+  // ngAfterViewChecked() {
+  //   console.log('View Checked!');
+  //   console.log(this.form.getRawValue());
+  // }
+
+  handleForm(form: FormGroup) {
+    console.log('form emitted', form);
   }
 
   onSubmit(form: FormGroup): void {

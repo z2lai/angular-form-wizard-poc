@@ -64,6 +64,9 @@ export class LongForm2Component implements OnInit, DoCheck {
     this.form.valueChanges.subscribe((formValue) => {
       console.log('Form Value Updated:', formValue);
     });
+    this.form.statusChanges.subscribe((formStatus) => {
+      console.log('Form Status Updated:', formStatus);
+    });
   }
 
   ngDoCheck() {
@@ -168,8 +171,8 @@ export class LongForm2Component implements OnInit, DoCheck {
     //   (issueForm.get('eligibilityValidators') as FormControl)?.valid;
     // let showEligible = (issueForm.get('eligibility') as FormGroup)?.disabled
     let showEligible = (issueForm.get('shouldLockEligibilityForm') as FormControl).value
-    console.log('showEligible', showEligible);
-    console.log(issueForm);
+    // console.log('showEligible', showEligible);
+    // console.log(issueForm);
     return showEligible;
   }
 
@@ -193,6 +196,7 @@ export class LongForm2Component implements OnInit, DoCheck {
     this.updateFormValueAndValidity(form); // async because of event emitter
     form.markAllAsTouched(); // async because of event emitter
     console.log('Marked form as touched:', form);
+    console.log('Marked form as touched:', form.status);
 
     if (form.valid) {
       // not triggered on the first time because emitted events to update parent form are async

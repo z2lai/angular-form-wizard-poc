@@ -28,6 +28,11 @@
   {{ form.errors | json }}
 </div>
 
+<!-- Why not just use formGroup so that this component can be tested in isolation without requiring a parent form -->
+<!-- I think the whole point of having this kind of component is only for situations when the formGroup is instantiated
+in the parent component (instead of the child) like a basic form with nested form groups would be -->
+<!-- But there are complex situations where the child has to instantiate the form controls dynamically... -->
+<!-- Either way, it seems odd to instantiate the child form group twice (once during parent formGroup initialization and another for child formGroup initialization) -->
 <div [formGroupName]="controlKey">
   <div class="row mt-3">
     <div class="col">

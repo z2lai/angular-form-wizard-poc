@@ -21,7 +21,7 @@
       }"
     >
       <!-- All value and validation statuses are updated when the form is created -->
-      {{ form.status }}
+      {{ formStatusChanges | async }}
     </span>
 
     {{ form.touched ? 'touched' : 'untouched' }}
@@ -42,7 +42,7 @@
     {{ form.errors | json }}
   </div>
 
-  <app-custom-wizard [linear]="isLinear">
+  <!-- <app-custom-wizard [linear]="isLinear">
     <cdk-step [stepControl]="issuesForm">
       <h4 class="mt-3">Issues</h4>
       <app-profile controlKey="issues"></app-profile>
@@ -55,6 +55,16 @@
     <cdk-step [stepControl]="documentsForm">
       <h4 class="mt-3">DOCUMENTS</h4>
     </cdk-step>
+  </app-custom-wizard> -->
+
+   <app-custom-wizard [linear]="isLinear">
+    <app-custom-wizard-step>
+      <h4 class="mt-3">Issues</h4>
+      <app-profile controlKey="issues" #stepForm></app-profile>
+    </app-custom-wizard-step>
+    <app-custom-wizard-step>
+      <h4 class="mt-3">PARTIES</h4>
+    </app-custom-wizard-step>
   </app-custom-wizard>
 
   <!-- <app-text-field-cva formControlName="testInput"></app-text-field-cva> -->

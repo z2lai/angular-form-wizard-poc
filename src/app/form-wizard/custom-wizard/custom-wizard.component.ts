@@ -1,4 +1,4 @@
-import { CdkStepper, CdkStepperModule } from '@angular/cdk/stepper';
+import { CdkStepper } from '@angular/cdk/stepper';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Component } from '@angular/core';
 
@@ -7,8 +7,7 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [   
     CommonModule,
-    NgTemplateOutlet, 
-    CdkStepperModule
+    NgTemplateOutlet,
   ],
   providers: [
     { 
